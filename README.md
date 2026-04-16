@@ -93,4 +93,3 @@ php artisan config:clear
 - nginx: 1.28.1
 - View: Blade
 - Docker / Docker Compose
-# laravel-attendance-app
