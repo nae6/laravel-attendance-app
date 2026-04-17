@@ -1,0 +1,78 @@
+html,
+body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+}
+
+/* header共通 */
+.header {
+    background-color: #000;
+    margin-bottom: 50px;
+}
+
+.header__inner {
+    margin: 0 auto;
+    padding: 22px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+}
+
+.header__logo {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.header__logo img {
+    display: block;
+    height: 36px;
+    width: auto;
+}
+
+/* main共通 */
+.content {
+    margin: 0 auto;
+    width: 100%;
+}
+
+
+/* 以下はまだ未編集 */
+/* header nav */
+.header__nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    white-space: nowrap;
+}
+
+.header__nav a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 24px;
+    line-height: 1;
+}
+
+.header__nav button {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.header__nav form {
+    margin: 0;
+}
+
+.header__nav a:last-child {
+    background: #fff;
+    color: #000;
+    padding: 8px 14px;
+    border-radius: 4px;
+}
