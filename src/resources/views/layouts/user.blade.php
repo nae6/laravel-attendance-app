@@ -19,10 +19,10 @@
             </a>
 
             @auth
-            <nav>
-                <a href="{{ route('') }}">勤怠</a>
-                <a href="{{ route('') }}">勤怠一覧</a>
-                <a href="{{ route('') }}">申請</a>
+            <nav class="header__nav">
+                <a href="#">勤怠</a>
+                <a href="#">勤怠一覧</a>
+                <a href="#">申請</a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit">ログアウト</button>

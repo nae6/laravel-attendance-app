@@ -44,9 +44,8 @@ body {
 /* header nav */
 .header__nav {
     display: flex;
-    align-items: center;
-    gap: 20px;
-    white-space: nowrap;
+    align-items: left;
+    gap: 40px;
 }
 
 .header__nav a {
@@ -64,15 +63,4 @@ body {
     font-size: 24px;
     cursor: pointer;
     line-height: 1;
-}
-
-.header__nav form {
-    margin: 0;
-}
-
-.header__nav a:last-child {
-    background: #fff;
-    color: #000;
-    padding: 8px 14px;
-    border-radius: 4px;
 }
