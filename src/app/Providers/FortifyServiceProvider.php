@@ -9,11 +9,13 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Laravel\Fortify\Http\Requests\LoginRequest as FortifyLoginRequest;
+use Laravel\Fortify\Contracts\LogoutResponse as LogoutResponseContract;
+use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 use Laravel\Fortify\Contracts\RegisterResponse;
-use Laravel\Fortify\Contracts\LogoutResponse;
-use Laravel\Fortify\Contracts\LoginResponse;
 use Laravel\Fortify\Fortify;
 use App\Actions\Fortify\CreateNewUser;
+use App\Http\Responses\LogoutResponse;
+use App\Http\Responses\LoginResponse;
 use App\Http\Requests\LoginRequest;
 use App\Models\User;
 
@@ -33,19 +35,8 @@ class FortifyServiceProvider extends ServiceProvider
             }
         });
 
-        $this->app->instance(LoginResponse::class, new class implements LoginResponse {
-            public function toResponse($request)
-            {
-                return redirect()->intended('/');
-            }
-        });
-
-        $this->app->instance(LogoutResponse::class, new class implements LogoutResponse {
-            public function toResponse($request)
-            {
-                return redirect()->route('login');
-            }
-        });
+        $this->app->singleton(LoginResponseContract::class, LoginResponse::class);
+        $this->app->singleton(LogoutResponseContract::class, LogoutResponse::class);
     }
 
     /**
@@ -53,14 +44,11 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // registerのカスタマイズ
         Fortify::createUsersUsing(CreateNewUser::class);
 
         Fortify::registerView(function () {
             return view('auth.register');
-        });
-
-        Fortify::loginView(function () {
-            return view('auth.login');
         });
 
         RateLimiter::for('login', function (Request $request) {
@@ -69,21 +57,35 @@ class FortifyServiceProvider extends ServiceProvider
             return Limit::perMinute(10)->by($email . $request->ip());
         });
 
+        // loginのカスタマイズ
         Fortify::authenticateUsing(function (Request $request) {
             $formRequest = LoginRequest::createFrom($request);
             $formRequest->setContainer(app())->validateResolved();
-
             $validated = $formRequest->validated();
 
             $user = User::where('email', $validated['email'])->first();
+            $role = $request->login_type === 'admin' ? 'admin' : 'user';
 
-            if ($user && Hash::check($validated['password'], $user->password)) {
-                return $user;
+            if (! $user) {
+                throw ValidationException::withMessages([
+                    'email' => 'ログイン情報が登録されていません。',
+                ]);
+            }
+            if ($user->role !== $role) {
+                throw ValidationException::withMessages([
+                    'role' => 'この画面からはログインできません。',
+                ]);
             }
 
-            throw ValidationException::withMessages([
-                    'password' => 'ログイン情報が登録されていません',
+            if (! Hash::check($request->password, $user->password)) {
+                throw ValidationException::withMessages([
+                    'email' => 'ログイン情報が登録されていません。',
                 ]);
+            }
+
+            $request->session()->put('login_type', $request->login_type);
+
+            return $user;
         });
     }
 }
