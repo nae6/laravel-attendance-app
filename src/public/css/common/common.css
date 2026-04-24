@@ -4,12 +4,13 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    background-color: #f0eff2;
+    box-sizing: border-box;
 }
 
 /* header共通 */
 .header {
     background-color: #000;
-    margin-bottom: 50px;
 }
 
 .header__inner {
@@ -33,14 +34,6 @@ body {
     width: auto;
 }
 
-/* main共通 */
-.content {
-    margin: 0 auto;
-    width: 100%;
-}
-
-
-/* 以下はまだ未編集 */
 /* header nav */
 .header__nav {
     display: flex;
@@ -63,4 +56,10 @@ body {
     font-size: 24px;
     cursor: pointer;
     line-height: 1;
+}
+
+/* main共通 */
+.content {
+    margin: 0 auto;
+    width: 100%;
 }
