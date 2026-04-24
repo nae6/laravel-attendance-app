@@ -1,6 +1,6 @@
 .content__title {
     text-align: center;
-    margin: 10px auto;
+    margin: 100px auto 10px;
     font-size: 36px;
     font-weight: bold;
 }
@@ -30,10 +30,12 @@
 .form__group input {
     padding: 10px;
     width: 100%;
-    height: 50px;
+    box-sizing: border-box;
+    height: 60px;
     border: 1px solid #000;
     border-radius: 3px;
     appearance: none;
+    font-size: 26px;
 }
 
 .form__btn-submit {
@@ -70,6 +72,14 @@
     color: #ff0000;
     text-align: left;
     font-size: 24px;
+}
+
+.form__error--role {
+    margin: 0 auto;
+    color: #ff0000;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
 }
 
 /* メール認証誘導画面 */

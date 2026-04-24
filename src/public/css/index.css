@@ -1,0 +1,62 @@
+p {
+    margin: 0;
+}
+
+.registration {
+    margin: 200px auto;
+    width: 50%;
+    text-align: center;
+    color: #000;
+}
+
+.status {
+    margin-bottom: 30px;
+    display: inline-block;
+    padding: 5px 25px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #696969;
+    background-color: #c8c8c8;
+    border-radius: 50px;
+}
+
+.date {
+    font-size: 40px;
+}
+
+.time {
+    margin-top: 40px;
+    margin-bottom: 100px;
+    font-size: 80px;
+    font-weight: bold;
+}
+
+.btn-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 80px;
+}
+
+.form__btn button {
+    width: 200px;
+    padding: 10px;
+    font-size: 32px;
+    font-weight: bold;
+    border-radius: 20px;
+}
+
+.form__btn--black {
+    background-color: #000;
+    color: #fff;
+}
+
+.form__btn--white {
+    background-color: #fff;
+    color: #000;
+    border: #fff;
+}
+
+.see-you {
+    font-size: 26px;
+    font-weight: bold;
+}
