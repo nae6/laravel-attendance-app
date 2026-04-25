@@ -7,47 +7,41 @@
 @endsection
 
 @section('content')
-<!-- switchを使ってステータスごとに表示変更する -->
-<!-- status = 勤務外 -->
 <div class="registration">
-    <p class="status">勤務外</p>
+    <p class="status">{{ $status }}</p>
     <p class="date">{{ $now_date }}</p>
     <p class="time">{{ $now_time }}</p>
-    <form action="" method="POST" class="form__btn">
+    @if (session('message'))
+    <p class="stamp">{{ session('message')}}</p>
+    @endif
+    @switch($status)
+    @case('勤務外')
+    <form action="{{ route('attendance.start') }}" method="POST" class="form__btn">
+        @csrf
         <button class="form__btn--black">出勤</button>
     </form>
-</div>
-
-<!-- status = 出勤中 -->
-<div class="registration">
-    <p class="status">出勤中</p>
-    <p class="date">{{ $now_date }}</p>
-    <p class="time">{{ $now_time }}</p>
+    @break
+    @case('出勤中')
     <div class="btn-wrapper">
-        <form action="#" method="POST" class="form__btn">
+        <form action="{{ route('attendance.end') }}" method="POST" class="form__btn">
+            @csrf
             <button class="form__btn--black">退勤</button>
         </form>
         <form action="#" method="POST" class="form__btn">
+            @csrf
             <button class="form__btn--white">休憩入</button>
         </form>
     </div>
-</div>
-
-<!-- status = 休憩中 -->
-<div class="registration">
-    <p class="status">休憩中</p>
-    <p class="date">{{ $now_date }}</p>
-    <p class="time">{{ $now_time }}</p>
+    @break
+    @case('休憩中')
     <form action="#" method="POST" class="form__btn">
+        @csrf
         <button class="form__btn--black">休憩戻</button>
     </form>
-</div>
-
-<!-- status = 退勤後 -->
-<div class="registration">
-    <p class="status">退勤済</p>
-    <p class="date">{{ $now_date }}</p>
-    <p class="time">{{ $now_time }}</p>
+    @break
+    @case('退勤済')
     <p class="see-you">お疲れ様でした。</p>
+    @break
+    @endswitch
 </div>
 @endsection
