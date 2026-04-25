@@ -31,6 +31,12 @@ p {
     font-weight: bold;
 }
 
+.stamp {
+    font-size: 40px;
+    color: #ff0000;
+    margin-bottom: 20px;
+}
+
 .btn-wrapper {
     display: flex;
     justify-content: center;

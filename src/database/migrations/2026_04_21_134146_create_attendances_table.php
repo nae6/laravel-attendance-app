@@ -16,10 +16,12 @@ return new class extends Migration
             $table->foreignId('user_id')
                 ->constrained()
                 ->cascadeOnDelete();
-            $table->date('work_date');
             $table->timestamp('check_in');
-            $table->timestamp('check_out');
-            $table->string('status');
+            $table->timestamp('check_out')->nullable();
+            $table->string('status')->default('出勤中');
+
+            $table->unique(['user_id', 'check_in']);
+            $table->unique(['user_id', 'check_out']);
         });
     }
 
