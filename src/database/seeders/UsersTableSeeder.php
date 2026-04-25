@@ -13,6 +13,7 @@ class UsersTableSeeder extends Seeder
      */
     public function run(): void
     {
+        // 管理者
         User::create([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
@@ -21,6 +22,14 @@ class UsersTableSeeder extends Seeder
             'role' => 'admin',
         ]);
 
-        User::factory()->count(4)->create();
+        // 一般ユーザー
+        User::factory()->create([
+            'name' => 'テスト桃子',
+            'email' => 'testmomoko@example.com',
+            'email_verified_at' => now(),
+            'password' => Hash::make('testmomoko'),
+        ]);
+
+        User::factory()->count(2)->create();
     }
 }
