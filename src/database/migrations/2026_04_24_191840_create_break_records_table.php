@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('attendance_id')
                 ->constrained()
-                ->nullOnDelete();
+                ->cascadeOnDelete();
             $table->timestamp('break_start');
-            $table->timestamp('break_end');
+            $table->timestamp('break_end')->nullable();
         });
     }
 
