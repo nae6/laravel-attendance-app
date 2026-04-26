@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use App\Models\BreakRecord;
 use App\Models\Attendance;
 use Carbon\Carbon;
 
@@ -33,7 +36,7 @@ class AttendanceController extends Controller
     }
 
     /**
-     * 出勤打刻機能
+     * 出勤打刻
      *
      * @return RedirectResponse
      */
@@ -59,7 +62,103 @@ class AttendanceController extends Controller
     }
 
     /**
-     * 退勤打刻機能
+     * 休憩入り打刻
+     *
+     * @return RedirectResponse
+     */
+    public function startBreak(): RedirectResponse {
+        $userId = Auth::id();
+
+        $attendance = Attendance::where('user_id', $userId)
+            ->whereDate('check_in', today())
+            ->first();
+
+        if (!$attendance) {
+            return redirect()->route('attendance')
+                ->with('message', '本日の出勤記録がありません');
+        }
+
+        if ($attendance->check_out) {
+            return redirect()->route('attendance')
+                ->with('message', '本日は退勤済みです');
+        }
+
+        try {
+            DB::transaction(function () use ($attendance) {
+                BreakRecord::create([
+                    'attendance_id' => $attendance->id,
+                    'break_start' => now(),
+                    'break_end' => null,
+                ]);
+
+                $attendance->update([
+                        'status' => '休憩中'
+                    ]);
+            });
+
+            return redirect()->route('attendance');
+        } catch (\Throwable $e) {
+            Log::error($e);
+
+            return redirect()->route('attendance')
+                ->with('error', '休憩開始に失敗しました');
+        }
+    }
+
+    /**
+     * 休憩戻り打刻
+     *
+     * @return RedirectResponse
+     */
+    public function endBreak(): RedirectResponse {
+        $userId = Auth::id();
+
+        $attendance = Attendance::where('user_id', $userId)
+            ->whereDate('check_in', today())
+            ->first();
+
+        if (!$attendance) {
+            return redirect()->route('attendance')
+                ->with('message', '本日の出勤記録がありません');
+        }
+
+        if ($attendance->check_out) {
+            return redirect()->route('attendance')
+                ->with('message', '本日は退勤済みです');
+        }
+
+        $break = BreakRecord::where('attendance_id', $attendance->id)
+            ->whereNull('break_end')
+            ->latest('break_start')
+            ->first();
+
+        if (!$break) {
+            return redirect()->route('attendance')
+                ->with('message', '終了できる休憩がありません');
+        }
+
+        try {
+            DB::transaction(function () use ($attendance, $break) {
+                $break->update([
+                    'break_end' => now(),
+                ]);
+
+                $attendance->update([
+                    'status' => '出勤中'
+                ]);
+            });
+
+            return redirect()->route('attendance');
+        } catch (\Throwable $e) {
+            Log::error($e);
+
+            return redirect()->route('attendance')
+                ->with('error', '休憩終了に失敗しました');
+        }
+    }
+
+    /**
+     * 退勤打刻
      *
      * @return RedirectResponse
      */
@@ -75,12 +174,11 @@ class AttendanceController extends Controller
                 ->with('message', '本日の退勤は打刻済みです');
         }
 
-        Attendance::find($attendance->id)
-            ->update([
+        $attendance->update([
                 'check_out' => now(),
                 'status' => '退勤済'
             ]);
 
-        return redirect()->route('attendance');
+        return redirect()->route('attendance')->with('message', '退勤しました');
     }
 }

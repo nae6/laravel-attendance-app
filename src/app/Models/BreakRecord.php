@@ -7,10 +7,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BreakRecord extends Model
 {
+    public $timestamps = false;
+
     protected $fillable = [
         'attendance_id',
         'break_start',
         'break_end',
+    ];
+
+    protected $casts = [
+        'break_start' => 'datetime',
+        'break_end' => 'datetime',
     ];
 
     /**
