@@ -13,7 +13,7 @@ Route::middleware(['web', 'guest'])->group(function () {
 });
 
 // userの画面
-Route::get('/attendance', [AttendanceController::class, 'index'])
+Route::get('/attendance', [AttendanceController::class, 'edit'])
     ->name('attendance');
 Route::post('/attendance/start', [AttendanceController::class, 'startWork'])
     ->name('attendance.start');
@@ -23,5 +23,9 @@ Route::post('/attendance/break-end', [AttendanceController::class, 'endBreak'])
     ->name('break.end');
 Route::post('/attendance/end', [AttendanceController::class, 'endWork'])
     ->name('attendance.end');
+Route::get('/attendance/list', [AttendanceController::class, 'index'])
+    ->name('attendance.index');
+Route::get('/attendance/detail/{attendance}', [AttendanceController::class, 'show'])
+    ->name('attendance.show');
 
 // adminの画面
