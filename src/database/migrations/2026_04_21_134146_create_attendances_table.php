@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('status')->default('出勤中');
 
             $table->unique(['user_id', 'check_in']);
-            $table->unique(['user_id', 'check_out']);
         });
     }
 
