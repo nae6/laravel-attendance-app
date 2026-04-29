@@ -3,8 +3,10 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\BreakRecord;
 use App\Models\Attendance;
 use App\Models\User;
+use Carbon\CarbonPeriod;
 use Carbon\Carbon;
 
 class AttendancesTableSeeder extends Seeder
@@ -15,22 +17,35 @@ class AttendancesTableSeeder extends Seeder
     public function run(): void
     {
         User::all()->each(function ($user) {
-            // 今日
-            Attendance::factory()->create([
-                'user_id' => $user->id,
-                'check_in' => now(),
-                'check_out' => now()->addHours(4),
-                'status' => '退勤済',
-            ]);
+            // 前月の日付一覧
+            $base = Carbon::now()->subMonthNoOverflow();
 
-            // 前日〜3日前
-            for ($i = 1; $i <= 3; $i++) {
-                Attendance::factory()->count(3)->create([
+            $start = $base->copy()->startOfMonth();
+            $end = $base->copy()->endOfMonth();
+
+            $dates = collect(CarbonPeriod::create($start, $end));
+
+            // 20日分のデータ作成
+            $randomDates = $dates->shuffle()->take(20);
+
+            foreach ($randomDates as $date) {
+                $attendance = Attendance::factory()->create([
                     'user_id' => $user->id,
-                    'check_in' => Carbon::now()->subDays($i)->setTime(rand(8, 10), rand(0, 59)),
-                    'check_out' => Carbon::now()->subDays($i)->setTime(rand(13, 19), rand(0, 59)),
+                    'check_in' => $date->copy()->setTime(rand(8, 10), rand(0, 59)),
+                    'check_out' => $date->copy()->setTime(rand(17, 21), rand(0, 59)),
                     'status' => '退勤済',
                 ]);
+
+                // 紐づく休憩データを作成
+                $breakStart = $date->copy()->setTime(rand(11, 14), rand(0, 59));
+
+                BreakRecord::factory()
+                    ->count(rand(0, 1))
+                    ->create([
+                        'attendance_id' => $attendance->id,
+                        'break_start' => $breakStart,
+                        'break_end' => $breakStart->copy()->addMinutes(rand(30, 90)),
+                    ]);
             }
         });
     }
