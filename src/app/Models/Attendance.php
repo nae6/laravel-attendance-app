@@ -107,4 +107,16 @@ class Attendance extends Model
 
         return sprintf('%d:%02d', $hours, $minutes);
     }
+
+    // 修正内容を取得
+    public function correctRequests()
+    {
+        return $this->hasMany(AttendanceCorrectRequest::class);
+    }
+
+    // 最新の修正内容を取得
+    public function latestCorrectRequest()
+    {
+        return $this->hasOne(AttendanceCorrectRequest::class)->latestOfMany();
+    }
 }

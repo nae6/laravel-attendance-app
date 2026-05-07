@@ -18,6 +18,8 @@ return new class extends Migration
                 ->cascadeOnDelete();
             $table->timestamp('break_start');
             $table->timestamp('break_end')->nullable();
+
+            $table->index('attendance_id');
         });
     }
 

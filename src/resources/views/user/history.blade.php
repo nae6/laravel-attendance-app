@@ -9,7 +9,7 @@
 @section('content')
 <h1 class="content-title">勤怠一覧</h1>
 <div class="month-nav font-setting">
-    <a href="{{ route('attendance.list', ['month' => $currentMonth->copy()->subMonth()->format('Y-m')]) }}">
+    <a href="{{ route('attendance.index', ['month' => $lastMonth]) }}">
         <img src="{{ asset('images/arrow.png') }}" alt="left-arrow" class="arrow">
         前月
     </a>
@@ -17,7 +17,7 @@
         <img src="{{ asset('images/calender.png') }}" alt="calender-icon">
         {{ $currentMonth->format('Y/m') }}
     </span>
-    <a href="{{ route('attendance.list', ['month' => $currentMonth->copy()->addMonth()->format('Y-m')]) }}">
+    <a href="{{ route('attendance.index', ['month' => $nextMonth]) }}">
         翌月
         <img src="{{ asset('images/arrow.png') }}" alt="right-arrow" class="arrow arrow__right">
     </a>
@@ -45,7 +45,13 @@
                 <td>{{ $attendance && $attendance->check_out ? $attendance->check_out->format('H:i'): '' }}</td>
                 <td>{{ $attendance?->break_time }}</td>
                 <td>{{ $attendance?->work_time }}</td>
-                <td><a href="#" class="detail__link">詳細</a></td>
+                <td class="detail__link">
+                    @if ($attendance)
+                    <a href="{{ route('attendance.edit', $attendance->id) }}">詳細</a>
+                    @else
+                    <a href="{{ route('attendance.create', ['date' => $date->format('Y-m-d')]) }}">詳細</a>
+                    @endif
+                </td>
             </tr>
             @endforeach
         </tbody>
