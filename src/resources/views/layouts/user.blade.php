@@ -14,13 +14,14 @@
 <body>
     <header class="header">
         <div class="header__inner">
-            <a href="/" class="header__logo">
+            <a href="{{ route('attendance') }}" class="header__logo">
                 <img src="{{ asset('images/header_logo.png') }}" alt="coachtech logo">
             </a>
 
             @auth
             <nav class="header__nav">
-                <a href="#">勤怠</a>
+                <a href="{{ route('attendance') }}">勤怠</a>
+                <!-- 勤怠のリンクは登録画面でいい？ -->
                 <a href="{{ route('attendance.index') }}">勤怠一覧</a>
                 <a href="#">申請</a>
                 <form method="POST" action="{{ route('logout') }}">
