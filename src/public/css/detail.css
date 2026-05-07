@@ -1,0 +1,96 @@
+.content-title {
+    border-left: 10px solid #000;
+    padding-left: 20px;
+    font-size: 30px;
+    font-weight: bold;
+    color: #000;
+}
+
+/* 勤怠詳細 */
+table {
+    margin: 50px 0;
+}
+
+.table__wrapper {
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #e1e1e1;
+    border-radius: 10px;
+    table-layout: fixed;
+    text-align: left;
+}
+
+.table__row {
+    border-bottom: 2px solid #e1e1e1;
+}
+
+.table__row:last-child {
+    border-bottom: none;
+}
+
+.table__row th {
+    width: 35%;
+    padding: 30px 0 30px 60px;
+}
+
+.table__row td {
+    width: 65%;
+    color: #000;
+}
+
+.time-input {
+    margin: 16px 0;
+    display: flex;
+    align-items: space-between;
+    gap: 8px;
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+    display: none;
+}
+
+input[type="time"] {
+    border: 1px solid #e1e1e1;
+    border-radius: 4px;
+    text-align: center;
+    color: #000;
+    font-weight: bold;
+    font-size: 16px;
+    letter-spacing: 15%;
+}
+
+.note__content {
+    width: 65%;
+    height: 80px;
+    margin: 20px 0;
+    border: 1px solid #d9d9d9;
+    border-radius: 10px;
+    display: block;
+}
+
+.form__error {
+    margin-top: 8px;
+    color: #ff0000;
+    font-weight: bold;
+}
+
+.btn-wrapper {
+    width: 100%;
+    text-align: right;
+}
+
+.btn {
+    padding: 10px 40px;
+    background-color: #000;
+    color: #fff;
+    font-size: 22px;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.form__message {
+    font-size: 18px;
+    font-weight: 800;
+    color: #ff0000;
+    opacity: 0.5;
+}
