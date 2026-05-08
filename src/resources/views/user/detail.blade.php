@@ -9,6 +9,10 @@
 @section('content')
 <h1 class="content-title">勤怠詳細</h1>
 
+@error('system_error')
+<p class="form__error">{{ $message }}</p>
+@enderror
+
 @if($correctRequest)
 <table class="table__wrapper font-setting">
     <tr class="table__row">
