@@ -2,15 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AttendanceCorrectRequestFormRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Models\Attendance;
-use App\Models\AttendanceCorrectRequest;
-use App\Models\BreakCorrectRequest;
 use Carbon\CarbonPeriod;
 use Carbon\Carbon;
 
@@ -75,39 +70,5 @@ class AttendanceController extends Controller
         $breakCount = $attendance?->breakRecords?->count() ?? 0;
 
         return view('user.detail', compact('date', 'attendance', 'breakCount'));
-    }
-
-    /**
-     * 勤怠の修正
-     *
-     * @return RedirectResponse
-     */
-    public function update(AttendanceCorrectRequestFormRequest $request, Attendance $attendance): RedirectResponse {
-        abort_if($attendance->user_id !== Auth::id(), 403);
-
-        $validated = $request->validated();
-
-        DB::transaction(function() use ($attendance, $validated) {
-            $correctRequest = AttendanceCorrectRequest::create([
-                'attendance_id' => $attendance->id,
-                'requested_check_in' => $validated['check_in'],
-                'requested_check_out' => $validated['check_out'],
-                'reason' => $validated['reason'],
-            ]);
-
-            foreach ($validated['breaks'] ?? [] as $break) {
-                if (empty($break['break_start']) && empty($break['break_end'])) {
-                    continue;
-                }
-
-                BreakCorrectRequest::create([
-                    'attendance_correct_request_id' => $correctRequest->id,
-                    'requested_break_start' => $break['break_start'],
-                    'requested_break_end' => $break['break_end'],
-                ]);
-            };
-        });
-
-        return redirect()->route('attendance.edit', $attendance);
     }
 }

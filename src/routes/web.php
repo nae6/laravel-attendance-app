@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AttendanceActionController;
+use App\Http\Controllers\CorrectRequestController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
@@ -29,8 +30,11 @@ Route::get('/attendance/list', [AttendanceController::class, 'index'])
     ->name('attendance.index');
 Route::get('/attendance/detail/{attendance}', [AttendanceController::class, 'edit'])
     ->name('attendance.edit');
-Route::put('/attendance/detail/{attendance}', [AttendanceController::class, 'update'])
+
+Route::put('/attendance/detail/{attendance}', [CorrectRequestController::class, 'update'])
     ->name('attendance.update');
+Route::get('/stamp_correction_request/list', [CorrectRequestController::class, 'index'])
+    ->name('request.list');
 
 // 入力が無い日の詳細表示・新規登録が必要な場合
 Route::get('/attendance/detail/date/{date}', [AttendanceController::class, 'create'])
