@@ -73,6 +73,8 @@ class CorrectRequestController extends Controller
             ->latest()
             ->get();
 
+        // 承認待ち・承認済で表示を分ける
+
         return view('user.stamp_correct_request', compact('requests'));
     }
 }
