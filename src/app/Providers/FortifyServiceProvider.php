@@ -68,18 +68,18 @@ class FortifyServiceProvider extends ServiceProvider
 
             if (! $user) {
                 throw ValidationException::withMessages([
-                    'email' => 'ログイン情報が登録されていません。',
+                    'email' => 'ログイン情報が登録されていません',
                 ]);
             }
             if ($user->role !== $role) {
                 throw ValidationException::withMessages([
-                    'role' => 'この画面からはログインできません。',
+                    'role' => 'この画面からはログインできません',
                 ]);
             }
 
             if (! Hash::check($request->password, $user->password)) {
                 throw ValidationException::withMessages([
-                    'email' => 'ログイン情報が登録されていません。',
+                    'email' => 'ログイン情報が登録されていません',
                 ]);
             }
 
