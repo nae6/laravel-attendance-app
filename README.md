@@ -56,9 +56,13 @@ make init
 
 ### 3. .envの環境変数を設定
 
-DB、MAILの設定を変更してください
+基本は `.env.example` を参照してください。
+Docker環境用に以下が設定されています：
 
-設定後はキャッシュをクリアしてください
+- DB: MySQL
+- Mail: Mailhog
+
+※設定変更後はキャッシュをクリアしてください
 
 ```bash
 php artisan config:clear
