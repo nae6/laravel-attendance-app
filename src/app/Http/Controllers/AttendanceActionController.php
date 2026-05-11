@@ -21,7 +21,6 @@ class AttendanceActionController extends Controller
     public function edit(): View
     {
         $userId = Auth::id();
-        $today = now()->toDateString();
 
         $attendance = Attendance::where('user_id', $userId)
             ->whereDate('check_in', today())
@@ -31,7 +30,12 @@ class AttendanceActionController extends Controller
 
         $now = Carbon::now();
         $now_date = $now->isoFormat('YYYY年MM月DD日(ddd)');
-        $now_time = $now->format('H:i');
+
+        if ($attendance && $attendance->status === '退勤済') {
+            $now_time = $attendance->check_out->format('H:i');
+        } else {
+            $now_time = now()->format('H:i');
+        }
 
         return view('user.index', compact('status', 'now_date', 'now_time'));
     }
