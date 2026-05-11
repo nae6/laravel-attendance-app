@@ -11,6 +11,8 @@
     @yield('css')
 </head>
 
+<script src="{{ asset('js/attendance-clock.js') }}"></script>
+
 <body>
     <header class="header">
         <div class="header__inner">
