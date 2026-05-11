@@ -10,7 +10,9 @@
 <div class="registration">
     <p class="status">{{ $status }}</p>
     <p class="date">{{ $now_date }}</p>
-    <p class="time">{{ $now_time }}</p>
+    <p class="time" id="attendance-clock" data-is-fixed="{{ $status === '退勤済' ? 'true' : 'false' }}">
+        {{ $now_time }}
+    </p>
     @if (session('message'))
     <p class="stamp">{{ session('message')}}</p>
     @endif
