@@ -124,4 +124,106 @@ class AttendanceShowTest extends TestCase
         $response->assertOk();
         $response->assertSee('2:00');
     }
+
+    /**
+     * 出勤時間が退勤時間より後になっている場合のエラーメッセージ
+     */
+    public function test_error_message_for_check_in_after_check_out(): void
+    {
+        $user = User::factory()->create();
+
+        $attendance = Attendance::factory()->create([
+            'user_id' => $user->id,
+        ]);
+
+        $response = $this->actingAs($user)->from(route('attendance.edit', $attendance->id))
+            ->put(route('attendance.update', $attendance->id), [
+                'check_in' => '11:00',
+                'check_out' => '09:00',
+                'reason' => 'テスト',
+            ]);
+
+        $response->assertRedirect(route('attendance.edit', $attendance->id));
+        $response->assertSessionHasErrors(['check_in' => '出勤時間もしくは退勤時間が不適切な値です']);
+    }
+
+    /**
+     * 休憩開始時間が退勤時間より後になっている場合のエラーメッセージ
+     */
+    public function test_error_message_for_break_start_after_check_out(): void
+    {
+        $user = User::factory()->create();
+
+        $attendance = Attendance::factory()->create([
+            'user_id' => $user->id,
+        ]);
+
+        $response = $this->actingAs($user)
+            ->from(route('attendance.edit', $attendance->id))
+            ->put(route('attendance.update', $attendance->id), [
+                'check_in' => '09:00',
+                'check_out' => '18:00',
+                'breaks' => [
+                    [
+                        'break_start' => '19:00',
+                        'break_end' => null,
+                    ],
+                ],
+                'reason' => 'テスト',
+            ]);
+
+        $response->assertRedirect(route('attendance.edit', $attendance->id));
+        $response->assertSessionHasErrors(['breaks.0.break_start' => '休憩時間が不適切な値です']);
+    }
+
+    /**
+     * 休憩終了時間が退勤時間より後になっている場合のエラーメッセージ
+     */
+    public function test_error_message_for_break_end_after_check_out(): void
+    {
+        $user = User::factory()->create();
+
+        $attendance = Attendance::factory()->create([
+            'user_id' => $user->id,
+        ]);
+
+        $response = $this->actingAs($user)
+            ->from(route('attendance.edit', $attendance->id))
+            ->put(route('attendance.update', $attendance->id), [
+                'check_in' => '09:00',
+                'check_out' => '18:00',
+                'breaks' => [
+                    [
+                        'break_start' => '17:00',
+                        'break_end' => '19:00',
+                    ],
+                ],
+                'reason' => 'テスト',
+            ]);
+
+        $response->assertRedirect(route('attendance.edit', $attendance->id));
+        $response->assertSessionHasErrors(['breaks.0.break_end' => '休憩時間もしくは退勤時間が不適切な値です']);
+    }
+
+    /**
+     * 備考欄が未入力になっている場合のエラーメッセージ
+     */
+    public function test_error_message_for_no_reason(): void
+    {
+        $user = User::factory()->create();
+
+        $attendance = Attendance::factory()->create([
+            'user_id' => $user->id,
+        ]);
+
+        $response = $this->actingAs($user)->from(route('attendance.edit', $attendance->id))
+            ->put(route('attendance.update', $attendance->id), [
+                'check_in' => '09:00',
+                'check_out' => '15:00',
+                'reason' => null,
+            ]);
+
+        $response->assertRedirect(route('attendance.edit', $attendance->id));
+        $response->assertSessionHasErrors(['reason' => '備考を記入してください']);
+    }
 }
