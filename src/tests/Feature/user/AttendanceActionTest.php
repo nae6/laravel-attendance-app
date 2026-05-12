@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use App\Models\BreakRecord;
 use App\Models\User;
 use Tests\TestCase;
+use Carbon\Carbon;
 
 class AttendanceActionTest extends TestCase
 {
@@ -146,8 +147,22 @@ class AttendanceActionTest extends TestCase
     }
 
     /**
-     * test6-3:出勤時刻が勤怠一覧画面で確認できる
+     * 出勤時刻が勤怠一覧画面で確認できる
      */
+    public function test_attendance_history_shows_check_in_after_attendance_start(): void
+    {
+        Carbon::setTestNow('2026-05-01 09:00:00');
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post(route('attendance.start'));
+
+        $response = $this->actingAs($user)->get(route('attendance.index'));
+
+        $response->assertOk();
+        $response->assertSee('2026/05');
+        $response->assertSee('05/01');
+        $response->assertSee('09:00');
+    }
 
     /**
      * 休憩ボタンの表示
@@ -320,6 +335,33 @@ class AttendanceActionTest extends TestCase
     }
 
     /**
+     * 休憩時刻が勤怠一覧画面で確認できる
+     */
+    public function test_attendance_history_shows_break_time_after_break(): void
+    {
+        $user = User::factory()->create();
+
+        Carbon::setTestNow('2026-05-01 09:00:00');
+        Attendance::factory()->create([
+            'user_id' => $user->id,
+            'check_in' => now(),
+            'check_out' => null,
+            'status' => '出勤中',
+        ]);
+
+        Carbon::setTestNow('2026-05-01 12:00:00');
+        $this->actingAs($user)->post(route('break.start'));
+
+        Carbon::setTestNow('2026-05-01 13:00:00');
+        $this->actingAs($user)->post(route('break.end'));
+
+        $response = $this->actingAs($user)->get(route('attendance.index'));
+
+        $response->assertOk();
+        $response->assertSee('1:00');
+    }
+
+    /**
      * 退勤ボタンの表示
      */
     public function test_attendance_page_shows_finished_button_when_working(): void
@@ -337,5 +379,30 @@ class AttendanceActionTest extends TestCase
         $response->assertOk();
         $response->assertSee('出勤中');
         $response->assertSee('<button type="submit" class="form__btn--black">退勤</button>', false);
+    }
+
+    /**
+     * 退勤時刻が勤怠一覧画面で確認できる
+     */
+    public function test_attendance_history_shows_finished_after_work(): void
+    {
+        $user = User::factory()->create();
+
+        Carbon::setTestNow('2026-05-01 17:00:00');
+        Attendance::factory()->create([
+            'user_id' => $user->id,
+            'check_in' => now()->subHour(8),
+            'check_out' => null,
+            'status' => '出勤中',
+        ]);
+
+        $this->actingAs($user)->post(route('attendance.end'));
+
+        $response = $this->actingAs($user)->get(route('attendance.index'));
+
+        $response->assertOk();
+        $response->assertSee('2026/05');
+        $response->assertSee('05/01');
+        $response->assertSee('17:00');
     }
 }
