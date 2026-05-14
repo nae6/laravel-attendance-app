@@ -58,17 +58,4 @@ class AttendanceController extends Controller
 
         return view('user.detail', compact('attendance', 'breakCount', 'correctRequest', 'displayBreaks'));
     }
-
-    /**
-     * 勤怠詳細画面の表示(勤怠の入力が無い日)
-     *
-     * 未完成！！！
-     *
-     */
-    public function create(string $date) {
-        $attendance = null;
-        $breakCount = $attendance?->breakRecords?->count() ?? 0;
-
-        return view('user.detail', compact('date', 'attendance', 'breakCount'));
-    }
 }

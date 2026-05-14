@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use Illuminate\View\View;
 use App\Models\AttendanceCorrectRequest;
 use App\Models\BreakCorrectRequest;
 use App\Models\Attendance;
@@ -19,8 +19,7 @@ class CorrectRequestController extends Controller
      *
      * @return RedirectResponse
      */
-    public function update(AttendanceCorrectRequestFormRequest $request, Attendance $attendance): RedirectResponse
-    {
+    public function update(AttendanceCorrectRequestFormRequest $request, Attendance $attendance): RedirectResponse {
         abort_if($attendance->user_id !== Auth::id(), 403);
 
         $validated = $request->validated();
@@ -63,18 +62,23 @@ class CorrectRequestController extends Controller
     /**
      * 申請一覧の表示(user)
      *
-     * @return
+     * @return View
      */
-    public function index() {
-        $requests = AttendanceCorrectRequest::with(['attendance.user'])
-            ->whereHas('attendance', function ($query) {
-                $query->where('user_id', Auth::id());
-            })
+    public function index(): View {
+        // 承認待ち
+        $pendingRequests = AttendanceCorrectRequest::with('attendance.user')
+            ->forUser(Auth::id())
+            ->where('approval_status', AttendanceCorrectRequest::STATUS_PENDING)
             ->latest()
             ->get();
 
-        // 承認待ち・承認済で表示を分ける
+        // 承認済
+        $approvedRequests = AttendanceCorrectRequest::with(['attendance.user'])
+            ->forUser(Auth::id())
+            ->where('approval_status', AttendanceCorrectRequest::STATUS_APPROVED)
+            ->latest()
+            ->get();
 
-        return view('user.stamp_correct_request', compact('requests'));
+        return view('user.stamp_correct_request', compact('pendingRequests', 'approvedRequests'));
     }
 }
