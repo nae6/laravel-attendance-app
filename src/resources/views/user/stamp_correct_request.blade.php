@@ -27,9 +27,9 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($requests as $request)
+                @forelse($pendingRequests as $request)
                 <tr class="table__inner">
-                    <td>{{ $request->approval_status }}</td>
+                    <td>{{ $request->status_label }}</td>
                     <td>{{ $request->attendance->user->name }}</td>
                     <td>{{ $request->requested_check_in->format('Y/m/d') }}</td>
                     <td>{{ $request->reason }}</td>
@@ -38,7 +38,11 @@
                         <a href="{{ route('attendance.edit', $request->attendance->id) }}">詳細</a>
                     </td>
                 </tr>
-                @endforeach
+                @empty
+                <tr class="table__inner">
+                    <td colspan="6">申請はありません</td>
+                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
@@ -60,9 +64,9 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($requests as $request)
+                @forelse($approvedRequests as $request)
                 <tr class="table__inner">
-                    <td>{{ $request->approval_status }}</td>
+                    <td>{{ $request->status_label }}</td>
                     <td>{{ $request->attendance->user->name }}</td>
                     <td>{{ $request->requested_check_in->format('Y/m/d') }}</td>
                     <td>{{ $request->reason }}</td>
@@ -71,7 +75,11 @@
                         <a href="{{ route('attendance.edit', $request->attendance->id) }}">詳細</a>
                     </td>
                 </tr>
-                @endforeach
+                @empty
+                <tr class="table__inner">
+                    <td colspan="6">承認された申請はありません</td>
+                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

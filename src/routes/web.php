@@ -36,7 +36,7 @@ Route::middleware(['web', 'guest'])->group(function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    // userの画面
+    // user
     Route::get('/attendance', [AttendanceActionController::class, 'edit'])
         ->name('attendance');
     Route::post('/attendance/start', [AttendanceActionController::class, 'startWork'])
@@ -58,11 +58,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/stamp_correction_request/list', [CorrectRequestController::class, 'index'])
         ->name('request.list');
 
-    // 入力が無い日の詳細表示・新規登録が必要な場合
-    Route::get('/attendance/detail/date/{date}', [AttendanceController::class, 'create'])
-        ->name('attendance.create');
-    Route::post('/attendance/detail/date/{date}', [AttendanceController::class, 'store'])
-        ->name('attendance.store');
+    // adminの画面
 });
-
-// adminの画面
