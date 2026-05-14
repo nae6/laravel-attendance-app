@@ -49,7 +49,7 @@
                     @if ($attendance)
                     <a href="{{ route('attendance.edit', $attendance->id) }}">詳細</a>
                     @else
-                    <a href="{{ route('attendance.create', ['date' => $date->format('Y-m-d')]) }}">詳細</a>
+                    <span>詳細</span>
                     @endif
                 </td>
             </tr>

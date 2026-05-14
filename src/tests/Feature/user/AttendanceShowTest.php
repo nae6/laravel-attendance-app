@@ -226,4 +226,20 @@ class AttendanceShowTest extends TestCase
         $response->assertRedirect(route('attendance.edit', $attendance->id));
         $response->assertSessionHasErrors(['reason' => '備考を記入してください']);
     }
+
+    /**
+     * 修正申請処理が実行される
+     */
+
+    /**
+     * 承認待ちに未承認の申請が全て表示される
+     */
+
+    /**
+     * 承認済に全ての承認済申請が表示される
+     */
+
+    /**
+     * 詳細を押すと勤怠詳細画面に遷移する
+     */
 }
