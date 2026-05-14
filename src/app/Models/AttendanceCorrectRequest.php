@@ -46,6 +46,16 @@ class AttendanceCorrectRequest extends Model
     }
 
     /**
+     * ログインユーザーの勤怠履歴を取得
+     */
+    public function scopeForUser($query, $userId)
+    {
+        return $query->whereHas('attendance', function ($q) use ($userId) {
+            $q->where('user_id', $userId);
+        });
+    }
+
+    /**
      * 休憩時間の修正申請内容を取得
      *
      * @return HasMany
