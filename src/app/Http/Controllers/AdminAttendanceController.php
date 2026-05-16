@@ -16,25 +16,41 @@ class AdminAttendanceController extends Controller
      *
      * @return View
      */
-    public function index(Request $request): View
+    public function index(Request $request): View {
+        $currentDate = $request->filled('date') ? Carbon::parse($request->date) : today();
+
+        $lastDate = $currentDate->copy()->subDay()->format('Y-m-d');
+        $nextDate = $currentDate->copy()->addDay()->format('Y-m-d');
+
+        // その日出勤したスタッフ全員の勤怠データ取得
+        $attendances = Attendance::with(['user', 'breakRecords'])
+            ->whereDate('check_in', $currentDate)
+            ->get();
+
+        return view('admin.admin_history', compact('attendances', 'currentDate', 'lastDate', 'nextDate'));
+    }
+
+    /**
+     * 勤怠詳細画面の表示
+     *
+     * @param Attendance $attendance
+     * @return View
+     */
+    public function edit(Attendance $attendance): View
     {
-        $currentMonth = Carbon::parse($request->input('month', today()->format('Y-m')));
+        abort_if($attendance->user_id !== Auth::id(), 403);
 
-        $lastMonth = $currentMonth->copy()->subMonth()->format('Y-m');
-        $nextMonth = $currentMonth->copy()->addMonth()->format('Y-m');
+        $attendance->load(['user', 'breakRecords', 'latestCorrectRequest.breakCorrectRequests',]);
 
-        // １ヶ月分の日付取得
-        $startOfMonth = $currentMonth->copy()->startOfMonth();
-        $endOfMonth = $currentMonth->copy()->endOfMonth();
-        $dates = CarbonPeriod::create($startOfMonth, $endOfMonth);
+        $correctRequest = $attendance->latestCorrectRequest;
 
-        // １ヶ月分の勤怠データ取得
-        $attendances = Attendance::with('breakRecords')
-            ->where('user_id', Auth::id())
-            ->whereBetween('check_in', [$startOfMonth, $endOfMonth->endOfDay()])
-            ->get()
-            ->keyBy(fn($attendance) => $attendance->check_in->format('Y-m-d'));
+        $displayBreaks = $correctRequest
+            ? $correctRequest->breakCorrectRequests
+            : $attendance->breakRecords;
+        $attendance->breakRecords;
 
-        return view('user.history', compact('attendances', 'currentMonth', 'dates', 'lastMonth', 'nextMonth'));
+        $breakCount = $displayBreaks?->count() ?? 0;
+
+        return view('user.detail', compact('attendance', 'breakCount', 'correctRequest', 'displayBreaks'));
     }
 }

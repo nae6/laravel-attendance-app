@@ -40,7 +40,6 @@ class AttendancesTableSeeder extends Seeder
                 $breakStart = $date->copy()->setTime(rand(11, 14), rand(0, 59));
 
                 BreakRecord::factory()
-                    ->count(rand(0, 1))
                     ->create([
                         'attendance_id' => $attendance->id,
                         'break_start' => $breakStart,
