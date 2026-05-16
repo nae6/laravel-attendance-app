@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AttendanceActionController;
 use App\Http\Controllers\CorrectRequestController;
+use App\Http\Controllers\AdminAttendanceController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\LoginController;
 
@@ -26,7 +27,7 @@ Route::post('/email/verification-notification', function (Request $request) {
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 /**
- * roleごとのlogin画面の表示
+ * roleごとの画面表示切り替え
  */
 Route::middleware(['web', 'guest'])->group(function () {
     Route::get('/login', [LoginController::class, 'user'])
@@ -59,4 +60,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('request.list');
 
     // adminの画面
+    Route::get('/admin/attendance/list', [AdminAttendanceController::class, 'index'])
+        ->name('admin.attendance.index');
+    Route::get('/admin/attendance/{attendance}', [AdminAttendanceController::class, 'edit'])
+        ->name('admin.attendance.edit');
 });

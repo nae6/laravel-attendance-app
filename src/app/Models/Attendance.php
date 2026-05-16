@@ -45,21 +45,6 @@ class Attendance extends Model
     }
 
     /**
-     * 合計休憩時間(分)の取得
-     *
-     * @return int
-     */
-    public function getBreakMinutesAttribute(): int {
-        return $this->breakRecords->sum(function ($break) {
-            if (!$break->break_start || !$break->break_end) {
-                return 0;
-            }
-
-            return $break->break_start->diffInMinutes($break->break_end, true);
-        });
-    }
-
-    /**
      * 合計勤務時間(分)の取得
      *
      * @return int
@@ -72,24 +57,6 @@ class Attendance extends Model
         return $this->check_in->diffInMinutes($this->check_out, true)
             - $this->break_minutes;
     }
-
-    /**
-     * 休憩時間（HH:MM形式）表示
-     *
-     * @return string|null
-     */
-    public function getBreakTimeAttribute(): ?string
-    {
-        if ($this->break_minutes <= 0) {
-            return null;
-        }
-
-        $hours = floor($this->break_minutes / 60);
-        $minutes = $this->break_minutes % 60;
-
-        return sprintf('%d:%02d', $hours, $minutes);
-    }
-
 
     /**
      * 勤務時間（HH:MM形式）表示
@@ -118,5 +85,38 @@ class Attendance extends Model
     public function latestCorrectRequest()
     {
         return $this->hasOne(AttendanceCorrectRequest::class)->latestOfMany();
+    }
+
+    /**
+     * 合計休憩時間(分)の取得
+     *
+     * @return int
+     */
+    public function getBreakMinutesAttribute(): int
+    {
+        return $this->breakRecords->sum(function ($break) {
+            if (!$break->break_start || !$break->break_end) {
+                return 0;
+            }
+
+            return $break->break_start->diffInMinutes($break->break_end, true);
+        });
+    }
+
+    /**
+     * 休憩時間（HH:MM形式）表示
+     *
+     * @return string|null
+     */
+    public function getBreakTimeAttribute(): ?string
+    {
+        if ($this->break_minutes <= 0) {
+            return null;
+        }
+
+        $hours = floor($this->break_minutes / 60);
+        $minutes = $this->break_minutes % 60;
+
+        return sprintf('%d:%02d', $hours, $minutes);
     }
 }

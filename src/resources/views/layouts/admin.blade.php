@@ -20,11 +20,12 @@
 
             @auth
             <nav class="header__nav">
-                <a href="{{ route('') }}">勤怠一覧</a>
-                <a href="{{ route('') }}">スタップ一覧</a>
-                <a href="{{ route('') }}">申請一覧</a>
+                <a href="{{ route('admin.attendance.index') }}">勤怠一覧</a>
+                <a href="#">スタップ一覧</a>
+                <a href="#">申請一覧</a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
+                    <input type="hidden" name="login_type" value="admin">
                     <button type="submit">ログアウト</button>
                 </form>
             </nav>
@@ -33,7 +34,9 @@
     </header>
 
     <main>
-        @yield('content')
+        <div class="content">
+            @yield('content')
+        </div>
     </main>
 </body>
 
