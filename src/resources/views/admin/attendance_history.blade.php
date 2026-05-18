@@ -8,6 +8,11 @@
 
 @section('content')
 <h1 class="content-title">{{ $currentDate->format('Y年m月d日') }}の勤怠</h1>
+
+@if (session('message'))
+<p class="stamp">{{ session('message')}}</p>
+@endif
+
 <div class="date-nav font-setting">
     <a href="{{ route('admin.attendance.index', ['date' => $lastDate]) }}">
         <img src="{{ asset('images/arrow.png') }}" alt="left-arrow" class="arrow">

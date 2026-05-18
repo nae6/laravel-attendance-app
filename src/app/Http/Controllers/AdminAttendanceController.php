@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Models\AttendanceCorrectRequest;
 use App\Models\Attendance;
-use Carbon\CarbonPeriod;
 use Carbon\Carbon;
 
 class AdminAttendanceController extends Controller
@@ -27,7 +26,7 @@ class AdminAttendanceController extends Controller
             ->whereDate('check_in', $currentDate)
             ->get();
 
-        return view('admin.admin_history', compact('attendances', 'currentDate', 'lastDate', 'nextDate'));
+        return view('admin.attendance_history', compact('attendances', 'currentDate', 'lastDate', 'nextDate'));
     }
 
     /**
@@ -36,21 +35,24 @@ class AdminAttendanceController extends Controller
      * @param Attendance $attendance
      * @return View
      */
-    public function edit(Attendance $attendance): View
-    {
-        abort_if($attendance->user_id !== Auth::id(), 403);
+    public function edit(Attendance $attendance): View {
+        $attendance->load(['user', 'breakRecords']);
 
-        $attendance->load(['user', 'breakRecords', 'latestCorrectRequest.breakCorrectRequests',]);
+        // 未承認の修正申請を取得
+        $correctRequest = $attendance->pendingCorrectRequest();
 
-        $correctRequest = $attendance->latestCorrectRequest;
-
+        // 表示用の休憩データ
         $displayBreaks = $correctRequest
             ? $correctRequest->breakCorrectRequests
             : $attendance->breakRecords;
-        $attendance->breakRecords;
 
-        $breakCount = $displayBreaks?->count() ?? 0;
+        $breakCount = $displayBreaks->count();
 
-        return view('user.detail', compact('attendance', 'breakCount', 'correctRequest', 'displayBreaks'));
+        return view('admin.attendance_detail', compact(
+            'attendance',
+            'breakCount',
+            'correctRequest',
+            'displayBreaks'
+        ));
     }
 }
