@@ -3,9 +3,10 @@
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Http\Controllers\AdminAttendanceCorrectController;
 use App\Http\Controllers\AttendanceActionController;
-use App\Http\Controllers\CorrectRequestController;
 use App\Http\Controllers\AdminAttendanceController;
+use App\Http\Controllers\CorrectRequestController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\LoginController;
 
@@ -36,6 +37,9 @@ Route::middleware(['web', 'guest'])->group(function () {
         ->name('admin.login');
 });
 
+/**
+ * ログイン済一般ユーザー
+ */
 Route::middleware(['auth', 'verified'])->group(function () {
     // user
     Route::get('/attendance', [AttendanceActionController::class, 'edit'])
@@ -58,10 +62,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('attendance.update');
     Route::get('/stamp_correction_request/list', [CorrectRequestController::class, 'index'])
         ->name('request.list');
-
-    // adminの画面
-    Route::get('/admin/attendance/list', [AdminAttendanceController::class, 'index'])
-        ->name('admin.attendance.index');
-    Route::get('/admin/attendance/{attendance}', [AdminAttendanceController::class, 'edit'])
-        ->name('admin.attendance.edit');
 });
+
+/**
+ * 管理者のみ
+ * ログイン済のミドルウェアとrole=adminのみのミドルウェアを設定する
+ */
+Route::get('/admin/attendance/list', [AdminAttendanceController::class, 'index'])
+    ->name('admin.attendance.index');
+Route::get('/admin/attendance/{attendance}', [AdminAttendanceController::class, 'edit'])
+    ->name('admin.attendance.edit');
+
+Route::put('/admin/attendance/detail/{attendance}', [AdminAttendanceCorrectController::class, 'update'])
+    ->name('admin.attendance.update');
