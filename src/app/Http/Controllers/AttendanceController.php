@@ -46,16 +46,23 @@ class AttendanceController extends Controller
     public function edit(Attendance $attendance): View {
         abort_if($attendance->user_id !== Auth::id(), 403);
 
-        $attendance->load(['user', 'breakRecords', 'latestCorrectRequest.breakCorrectRequests',]);
+        $attendance->load(['user', 'breakRecords']);
 
-        $correctRequest = $attendance->latestCorrectRequest;
+        // 未承認の修正申請を取得
+        $correctRequest = $attendance->pendingCorrectRequest();
 
+        // 表示用の休憩データ
         $displayBreaks = $correctRequest
             ? $correctRequest->breakCorrectRequests
-            : $attendance->breakRecords;$attendance->breakRecords;
+            : $attendance->breakRecords;
 
-        $breakCount = $displayBreaks?->count() ?? 0;
+        $breakCount = $displayBreaks->count();
 
-        return view('user.detail', compact('attendance', 'breakCount', 'correctRequest', 'displayBreaks'));
+        return view('user.detail', compact(
+            'attendance',
+            'breakCount',
+            'correctRequest',
+            'displayBreaks'
+        ));
     }
 }

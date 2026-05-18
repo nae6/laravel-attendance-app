@@ -44,6 +44,11 @@ class Attendance extends Model
         return $this->hasMany(BreakRecord::class);
     }
 
+    // 修正内容を取得
+    public function correctRequests(): HasMany {
+        return $this->hasMany(AttendanceCorrectRequest::class);
+    }
+
     /**
      * 合計勤務時間(分)の取得
      *
@@ -63,8 +68,7 @@ class Attendance extends Model
      *
      * @return string|null
      */
-    public function getWorkTimeAttribute(): ?string
-    {
+    public function getWorkTimeAttribute(): ?string {
         if ($this->work_minutes <= 0) {
             return null;
         }
@@ -75,16 +79,13 @@ class Attendance extends Model
         return sprintf('%d:%02d', $hours, $minutes);
     }
 
-    // 修正内容を取得
-    public function correctRequests()
-    {
-        return $this->hasMany(AttendanceCorrectRequest::class);
-    }
-
-    // 最新の修正内容を取得
-    public function latestCorrectRequest()
-    {
-        return $this->hasOne(AttendanceCorrectRequest::class)->latestOfMany();
+    // 未認証の申請内容のうち最新の１件を取得
+    public function pendingCorrectRequest(): ?AttendanceCorrectRequest {
+        return $this->correctRequests()
+            ->with('breakCorrectRequests')
+            ->where('approval_status', AttendanceCorrectRequest::STATUS_PENDING)
+            ->latest()
+            ->first();
     }
 
     /**
@@ -92,8 +93,7 @@ class Attendance extends Model
      *
      * @return int
      */
-    public function getBreakMinutesAttribute(): int
-    {
+    public function getBreakMinutesAttribute(): int {
         return $this->breakRecords->sum(function ($break) {
             if (!$break->break_start || !$break->break_end) {
                 return 0;
@@ -108,8 +108,7 @@ class Attendance extends Model
      *
      * @return string|null
      */
-    public function getBreakTimeAttribute(): ?string
-    {
+    public function getBreakTimeAttribute(): ?string {
         if ($this->break_minutes <= 0) {
             return null;
         }
