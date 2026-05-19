@@ -97,7 +97,7 @@ class AttendanceShowTest extends TestCase
     }
 
     /**
-     * 休憩の合計時間がログインユーザーの打刻と一致している
+     * 休憩時間がログインユーザーの打刻と一致している
      */
     public function test_attendance_detail_shows_break_records_for_login_user(): void
     {
@@ -113,16 +113,12 @@ class AttendanceShowTest extends TestCase
             'break_start' => '2026-05-01 11:00:00',
             'break_end' => '2026-05-01 12:00:00',
         ]);
-        BreakRecord::factory()->create([
-            'attendance_id' => $attendance->id,
-            'break_start' => '2026-05-01 15:00:00',
-            'break_end' => '2026-05-01 16:00:00',
-        ]);
 
         $response = $this->actingAs($user)->get(route('attendance.index', $attendance->id));
 
         $response->assertOk();
-        $response->assertSee('2:00');
+        $response->assertSee('11:00');
+        $response->assertSee('12:00');
     }
 
     /**
@@ -240,6 +236,6 @@ class AttendanceShowTest extends TestCase
      */
 
     /**
-     * 詳細を押すと勤怠詳細画面に遷移する
+     * 
      */
 }
