@@ -8,6 +8,7 @@ use App\Http\Controllers\AttendanceActionController;
 use App\Http\Controllers\AdminAttendanceController;
 use App\Http\Controllers\CorrectRequestController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AdminStaffController;
 use App\Http\Controllers\LoginController;
 
 /**
@@ -75,3 +76,8 @@ Route::get('/admin/attendance/{attendance}', [AdminAttendanceController::class, 
 
 Route::put('/admin/attendance/detail/{attendance}', [AdminAttendanceCorrectController::class, 'update'])
     ->name('admin.attendance.update');
+
+Route::get('/admin/staff/list', [AdminStaffController::class, 'staffList'])
+    ->name('staff.list');
+Route::get('/admin/attendance/staff/{staff}', [AdminStaffController::class, 'attendanceHistory'])
+    ->name('staff.attendance.list');

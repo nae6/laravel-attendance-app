@@ -17,6 +17,10 @@ class AdminAttendanceShowTest extends TestCase
      */
     public function test_admin_attendance_detail_page_shows_selected_attendance_record(): void
     {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
         $user = User::factory()->create([
             'name' => 'テスト太郎',
         ]);
@@ -33,7 +37,7 @@ class AdminAttendanceShowTest extends TestCase
             'break_end' => '2026-05-02 12:00:00',
         ]);
 
-        $response = $this->actingAs($user)->get(route('attendance.edit', $attendance->id));
+        $response = $this->actingAs($admin)->get(route('admin.attendance.edit', $attendance->id));
 
         $response->assertOk();
         $response->assertSee('テスト太郎');
@@ -43,7 +47,6 @@ class AdminAttendanceShowTest extends TestCase
         $response->assertSee('17:00');
         $response->assertSee('11:00');
         $response->assertSee('12:00');
-        $response->assertSee(route('attendance.edit', $attendance->id), false);
     }
 
 
@@ -52,20 +55,24 @@ class AdminAttendanceShowTest extends TestCase
      */
     public function test_error_message_for_check_in_after_check_out(): void
     {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
         $user = User::factory()->create();
 
         $attendance = Attendance::factory()->create([
             'user_id' => $user->id,
         ]);
 
-        $response = $this->actingAs($user)->from(route('attendance.edit', $attendance->id))
+        $response = $this->actingAs($admin)->from(route('admin.attendance.edit', $attendance->id))
             ->put(route('attendance.update', $attendance->id), [
                 'check_in' => '11:00',
                 'check_out' => '09:00',
                 'reason' => 'テスト',
             ]);
 
-        $response->assertRedirect(route('attendance.edit', $attendance->id));
+        $response->assertRedirect(route('admin.attendance.edit', $attendance->id));
         $response->assertSessionHasErrors(['check_in' => '出勤時間もしくは退勤時間が不適切な値です']);
     }
 
@@ -74,15 +81,19 @@ class AdminAttendanceShowTest extends TestCase
      */
     public function test_error_message_for_break_start_after_check_out(): void
     {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
         $user = User::factory()->create();
 
         $attendance = Attendance::factory()->create([
             'user_id' => $user->id,
         ]);
 
-        $response = $this->actingAs($user)
-            ->from(route('attendance.edit', $attendance->id))
-            ->put(route('attendance.update', $attendance->id), [
+        $response = $this->actingAs($admin)
+            ->from(route('admin.attendance.edit', $attendance->id))
+            ->put(route('admin.attendance.update', $attendance->id), [
                 'check_in' => '09:00',
                 'check_out' => '18:00',
                 'breaks' => [
@@ -94,7 +105,7 @@ class AdminAttendanceShowTest extends TestCase
                 'reason' => 'テスト',
             ]);
 
-        $response->assertRedirect(route('attendance.edit', $attendance->id));
+        $response->assertRedirect(route('admin.attendance.edit', $attendance->id));
         $response->assertSessionHasErrors(['breaks.0.break_start' => '休憩時間が不適切な値です']);
     }
 
@@ -103,15 +114,19 @@ class AdminAttendanceShowTest extends TestCase
      */
     public function test_error_message_for_break_end_after_check_out(): void
     {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
         $user = User::factory()->create();
 
         $attendance = Attendance::factory()->create([
             'user_id' => $user->id,
         ]);
 
-        $response = $this->actingAs($user)
-            ->from(route('attendance.edit', $attendance->id))
-            ->put(route('attendance.update', $attendance->id), [
+        $response = $this->actingAs($admin)
+            ->from(route('admin.attendance.edit', $attendance->id))
+            ->put(route('admin.attendance.update', $attendance->id), [
                 'check_in' => '09:00',
                 'check_out' => '18:00',
                 'breaks' => [
@@ -123,7 +138,7 @@ class AdminAttendanceShowTest extends TestCase
                 'reason' => 'テスト',
             ]);
 
-        $response->assertRedirect(route('attendance.edit', $attendance->id));
+        $response->assertRedirect(route('admin.attendance.edit', $attendance->id));
         $response->assertSessionHasErrors(['breaks.0.break_end' => '休憩時間もしくは退勤時間が不適切な値です']);
     }
 
@@ -132,20 +147,24 @@ class AdminAttendanceShowTest extends TestCase
      */
     public function test_error_message_for_no_reason(): void
     {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
         $user = User::factory()->create();
 
         $attendance = Attendance::factory()->create([
             'user_id' => $user->id,
         ]);
 
-        $response = $this->actingAs($user)->from(route('attendance.edit', $attendance->id))
-            ->put(route('attendance.update', $attendance->id), [
+        $response = $this->actingAs($admin)->from(route('admin.attendance.edit', $attendance->id))
+            ->put(route('admin.attendance.update', $attendance->id), [
                 'check_in' => '09:00',
                 'check_out' => '15:00',
                 'reason' => null,
             ]);
 
-        $response->assertRedirect(route('attendance.edit', $attendance->id));
+        $response->assertRedirect(route('admin.attendance.edit', $attendance->id));
         $response->assertSessionHasErrors(['reason' => '備考を記入してください']);
     }
 }
