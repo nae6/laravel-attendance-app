@@ -21,7 +21,7 @@
             @auth
             <nav class="header__nav">
                 <a href="{{ route('admin.attendance.index') }}">勤怠一覧</a>
-                <a href="#">スタップ一覧</a>
+                <a href="{{ route('staff.list') }}">スタップ一覧</a>
                 <a href="#">申請一覧</a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
