@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use App\Models\BreakRecord;
 use App\Models\User;
 use Tests\TestCase;
+use Carbon\Carbon;
 
 class AttendanceListTest extends TestCase
 {
@@ -18,13 +19,13 @@ class AttendanceListTest extends TestCase
     public function test_attendance_history_shows_all_records_for_login_user(): void {
         $user = User::factory()->create();
 
-        $attendance1 = Attendance::factory()->create([
+        $attendance = Attendance::factory()->create([
             'user_id' => $user->id,
             'check_in' => '2026-05-01 09:00:00',
             'check_out' => '2026-05-01 18:00:00',
         ]);
         BreakRecord::factory()->create([
-            'attendance_id' => $attendance1->id,
+            'attendance_id' => $attendance->id,
             'break_start' => '2026-05-01 12:00:00',
             'break_end' => '2026-05-01 13:00:00',
         ]);
@@ -69,13 +70,16 @@ class AttendanceListTest extends TestCase
      */
     public function test_attendance_history_shows_before_month(): void
     {
-        $user = User::factory()->create();
-        $lastMonth = now()->subMonth()->format('Y-m');
+        Carbon::setTestNow('2026-06-15');
 
-        $response = $this->actingAs($user)->get(route('attendance.index', ['month' => $lastMonth]));
+        $user = User::factory()->create();
+
+        $lastMonth = now()->subMonth();
+
+        $response = $this->actingAs($user)->get(route('attendance.index', ['month' => $lastMonth->format('Y-m')]));
 
         $response->assertOk();
-        $response->assertSee($lastMonth);
+        $response->assertSee($lastMonth->format('Y/m'));
     }
 
     /**
@@ -83,13 +87,16 @@ class AttendanceListTest extends TestCase
      */
     public function test_attendance_history_shows_next_month(): void
     {
-        $user = User::factory()->create();
-        $nextMonth = now()->addMonth()->format('Y-m');
+        Carbon::setTestNow('2026-06-15');
 
-        $response = $this->actingAs($user)->get(route('attendance.index', ['month' => $nextMonth]));
+        $user = User::factory()->create();
+
+        $nextMonth = now()->addMonth();
+
+        $response = $this->actingAs($user)->get(route('attendance.index', ['month' => $nextMonth->format('Y-m')]));
 
         $response->assertOk();
-        $response->assertSee($nextMonth);
+        $response->assertSee($nextMonth->format('Y/m'));
     }
 
     /**
@@ -97,12 +104,15 @@ class AttendanceListTest extends TestCase
      */
     public function test_attendance_history_has_detail_link(): void
     {
+        Carbon::setTestNow('2026-06-15');
+        $currentMonth = now();
+
         $user = User::factory()->create();
 
         $attendance = Attendance::factory()->create([
             'user_id' => $user->id,
-            'check_in' => '2026-05-02 10:00:00',
-            'check_out' => '2026-05-02 17:00:00',
+            'check_in' => $currentMonth->copy()->day(1)->setTime(9, 0),
+            'check_out' => $currentMonth->copy()->day(1)->setTime(18, 0),
         ]);
 
         $response = $this->actingAs($user)->get(route('attendance.index'));
@@ -116,18 +126,21 @@ class AttendanceListTest extends TestCase
      */
     public function test_attendance_detail_page_is_displayed(): void
     {
+        Carbon::setTestNow('2026-06-15');
+        $currentMonth = now();
+
         $user = User::factory()->create();
 
         $attendance = Attendance::factory()->create([
             'user_id' => $user->id,
-            'check_in' => '2026-05-02 10:00:00',
-            'check_out' => '2026-05-02 17:00:00',
+            'check_in' => $currentMonth->copy()->day(1)->setTime(9, 0),
+            'check_out' => $currentMonth->copy()->day(1)->setTime(18, 0),
         ]);
 
         $response = $this->actingAs($user)->get(route('attendance.edit', $attendance->id));
 
         $response->assertOk();
-        $response->assertSee('2026年');
-        $response->assertSee('5月2日');
+        $response->assertSee($attendance->check_in->format('Y年'));
+        $response->assertSee($attendance->check_in->format('n月j日'));
     }
 }
