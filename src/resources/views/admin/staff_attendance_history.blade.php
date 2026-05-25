@@ -60,7 +60,7 @@
     </table>
 </div>
 
-<div class="export">
-    <a href="{{ route('staff.attendance.export', ['staff' => $staff->id, 'month' => $currentMonth->format('Y-m')]) }}" class="export-btn">エクスポート</a>
+<div class="btn-wrapper">
+    <a href="{{ route('staff.attendance.export', ['staff' => $staff->id, 'month' => $currentMonth->format('Y-m')]) }}" class="btn">CSV出力</a>
 </div>
 @endsection
