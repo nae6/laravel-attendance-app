@@ -129,3 +129,19 @@ table {
 .tabs label:has(:checked)+div {
     display: block;
 }
+
+/* エクスポートボタン */
+.btn-wrapper {
+    width: 100%;
+    text-align: right;
+    margin-top: 60px;
+}
+
+.btn {
+    padding: 10px 40px;
+    background-color: #000;
+    color: #fff;
+    font-size: 22px;
+    font-weight: bold;
+    border-radius: 5px;
+}

@@ -81,3 +81,5 @@ Route::get('/admin/staff/list', [AdminStaffController::class, 'staffList'])
     ->name('staff.list');
 Route::get('/admin/attendance/staff/{staff}', [AdminStaffController::class, 'attendanceHistory'])
     ->name('staff.attendance.list');
+Route::get('/admin/attendance/staff/{staff}/export', [AdminStaffController::class, 'export'])
+    ->name('staff.attendance.export');
