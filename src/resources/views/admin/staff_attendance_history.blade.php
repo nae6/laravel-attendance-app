@@ -59,4 +59,8 @@
         </tbody>
     </table>
 </div>
+
+<div class="export">
+    <a href="{{ route('staff.attendance.export', ['staff' => $staff->id, 'month' => $currentMonth->format('Y-m')]) }}" class="export-btn">エクスポート</a>
+</div>
 @endsection
