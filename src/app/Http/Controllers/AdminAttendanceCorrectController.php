@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AttendanceCorrectRequestFormRequest;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 use App\Models\AttendanceCorrectRequest;
 use App\Models\BreakCorrectRequest;
 use App\Models\Attendance;
+use App\Models\User;
 use Carbon\Carbon;
 
 class AdminAttendanceCorrectController extends Controller
@@ -123,9 +125,30 @@ class AdminAttendanceCorrectController extends Controller
     {
         return Carbon::parse("$date $time");
     }
-}
 
-    //修正申請一覧
+    /**
+     * 申請一覧の表示(admin)
+     *
+     * @return View
+     */
+    public function index(): View {
+        // 承認待ち
+        $pendingRequests = AttendanceCorrectRequest::with('attendance.user')
+            ->where('approval_status', AttendanceCorrectRequest::STATUS_PENDING)
+            ->latest('created_at')
+            ->get();
+
+        // 承認済
+        $approvedRequests = AttendanceCorrectRequest::with(['attendance.user'])
+            ->where('approval_status', AttendanceCorrectRequest::STATUS_APPROVED)
+            ->latest('created_at')
+            ->get();
+
+        return view('admin.request_history', compact('pendingRequests', 'approvedRequests'));
+    }
+
+
     // 修正申請の承認
     // 承認後に勤怠データへ反映
+}
 

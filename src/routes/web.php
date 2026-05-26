@@ -76,6 +76,8 @@ Route::get('/admin/attendance/{attendance}', [AdminAttendanceController::class, 
 
 Route::put('/admin/attendance/detail/{attendance}', [AdminAttendanceCorrectController::class, 'update'])
     ->name('admin.attendance.update');
+Route::get('/stamp_correction_request/list', [AdminAttendanceCorrectController::class, 'index'])
+    ->name('admin.request.list');
 
 Route::get('/admin/staff/list', [AdminStaffController::class, 'staffList'])
     ->name('staff.list');
