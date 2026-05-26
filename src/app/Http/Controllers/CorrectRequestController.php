@@ -69,16 +69,16 @@ class CorrectRequestController extends Controller
         $pendingRequests = AttendanceCorrectRequest::with('attendance.user')
             ->forUser(Auth::id())
             ->where('approval_status', AttendanceCorrectRequest::STATUS_PENDING)
-            ->latest()
+            ->latest('created_at')
             ->get();
 
         // 承認済
         $approvedRequests = AttendanceCorrectRequest::with(['attendance.user'])
             ->forUser(Auth::id())
             ->where('approval_status', AttendanceCorrectRequest::STATUS_APPROVED)
-            ->latest()
+            ->latest('created_at')
             ->get();
 
-        return view('user.stamp_correct_request', compact('pendingRequests', 'approvedRequests'));
+        return view('common.stamp_correct_request', compact('pendingRequests', 'approvedRequests'));
     }
 }

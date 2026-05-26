@@ -11,28 +11,22 @@
     @yield('css')
 </head>
 
-<script src="{{ asset('js/attendance-clock.js') }}"></script>
-
 <body>
     <header class="header">
         <div class="header__inner">
-            <a href="{{ route('attendance') }}" class="header__logo">
+            <a href="/" class="header__logo">
                 <img src="{{ asset('images/header_logo.png') }}" alt="coachtech logo">
             </a>
-
             @auth
-            <nav class="header__nav">
-                <a href="{{ route('attendance') }}">勤怠</a>
-                <a href="{{ route('attendance.index') }}">勤怠一覧</a>
-                <a href="{{ route('request.list') }}">申請</a>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit">ログアウト</button>
-                </form>
-            </nav>
+                @if(Auth::user()->role === 'admin')
+                    @include('common.admin_header')
+                @else
+                    @include('common.user_header')
+                @endif
             @endauth
         </div>
     </header>
+
     <main>
         <div class="content">
             @yield('content')
