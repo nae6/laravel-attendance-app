@@ -1,4 +1,4 @@
-@extends('layouts.user')
+@extends('common.app')
 
 @section('title', '勤怠詳細')
 

@@ -1,4 +1,4 @@
-@extends('layouts.user')
+@extends('common.app')
 
 @section('title', '新規会員登録')
 
