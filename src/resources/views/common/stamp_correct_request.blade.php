@@ -1,6 +1,6 @@
-@extends('layouts.admin')
+@extends('common.app')
 
-@section('title', '管理者用申請一覧')
+@section('title', '申請一覧')
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('css/history.css') }}">
@@ -35,7 +35,7 @@
                     <td>{{ $request->reason }}</td>
                     <td>{{ $request->created_at->format('Y/m/d') }}</td>
                     <td class="detail__link">
-                        <a href="#">詳細</a>
+                        <a href="{{ route('attendance.edit', $request->attendance->id) }}">詳細</a>
                     </td>
                 </tr>
                 @empty
@@ -72,7 +72,7 @@
                     <td>{{ $request->reason }}</td>
                     <td>{{ $request->created_at->format('Y/m/d') }}</td>
                     <td class="detail__link">
-                        <a href="#">詳細</a>
+                        <a href="{{ route('attendance.edit', $request->attendance->id) }}">詳細</a>
                     </td>
                 </tr>
                 @empty

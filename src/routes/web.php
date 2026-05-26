@@ -29,7 +29,7 @@ Route::post('/email/verification-notification', function (Request $request) {
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 /**
- * roleごとの画面表示切り替え
+ * roleごとのログイン画面表示切り替え
  */
 Route::middleware(['web', 'guest'])->group(function () {
     Route::get('/login', [LoginController::class, 'user'])
@@ -42,7 +42,6 @@ Route::middleware(['web', 'guest'])->group(function () {
  * ログイン済一般ユーザー
  */
 Route::middleware(['auth', 'verified'])->group(function () {
-    // user
     Route::get('/attendance', [AttendanceActionController::class, 'edit'])
         ->name('attendance');
     Route::post('/attendance/start', [AttendanceActionController::class, 'startWork'])
@@ -67,21 +66,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 /**
  * 管理者のみ
- * ログイン済のミドルウェアとrole=adminのみのミドルウェアを設定する
  */
-Route::get('/admin/attendance/list', [AdminAttendanceController::class, 'index'])
-    ->name('admin.attendance.index');
-Route::get('/admin/attendance/{attendance}', [AdminAttendanceController::class, 'edit'])
-    ->name('admin.attendance.edit');
+Route::middleware(['auth', 'verified', 'admin'])->group(function () {
+    Route::get('/admin/attendance/list', [AdminAttendanceController::class, 'index'])
+        ->name('admin.attendance.index');
+    Route::get('/admin/attendance/{attendance}', [AdminAttendanceController::class, 'edit'])
+        ->name('admin.attendance.edit');
 
-Route::put('/admin/attendance/detail/{attendance}', [AdminAttendanceCorrectController::class, 'update'])
-    ->name('admin.attendance.update');
-Route::get('/stamp_correction_request/list', [AdminAttendanceCorrectController::class, 'index'])
-    ->name('admin.request.list');
+    Route::put('/admin/attendance/detail/{attendance}', [AdminAttendanceCorrectController::class, 'update'])
+        ->name('admin.attendance.update');
+    Route::get('/admin/stamp_correction_request/list', [AdminAttendanceCorrectController::class, 'index'])
+        ->name('admin.request.list');
 
-Route::get('/admin/staff/list', [AdminStaffController::class, 'staffList'])
-    ->name('staff.list');
-Route::get('/admin/attendance/staff/{staff}', [AdminStaffController::class, 'attendanceHistory'])
-    ->name('staff.attendance.list');
-Route::get('/admin/attendance/staff/{staff}/export', [AdminStaffController::class, 'export'])
-    ->name('staff.attendance.export');
+    Route::get('/admin/staff/list', [AdminStaffController::class, 'staffList'])
+        ->name('staff.list');
+    Route::get('/admin/attendance/staff/{staff}', [AdminStaffController::class, 'attendanceHistory'])
+        ->name('staff.attendance.list');
+    Route::get('/admin/attendance/staff/{staff}/export', [AdminStaffController::class, 'export'])
+        ->name('staff.attendance.export');
+});

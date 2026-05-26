@@ -10,7 +10,6 @@ use Illuminate\View\View;
 use App\Models\AttendanceCorrectRequest;
 use App\Models\BreakCorrectRequest;
 use App\Models\Attendance;
-use App\Models\User;
 use Carbon\Carbon;
 
 class AdminAttendanceCorrectController extends Controller
@@ -144,7 +143,7 @@ class AdminAttendanceCorrectController extends Controller
             ->latest('created_at')
             ->get();
 
-        return view('admin.request_history', compact('pendingRequests', 'approvedRequests'));
+        return view('common.stamp_correct_request', compact('pendingRequests', 'approvedRequests'));
     }
 
 
