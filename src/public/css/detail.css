@@ -79,9 +79,18 @@ input[type="time"] {
     text-align: right;
 }
 
-.btn {
+.form__btn {
     padding: 10px 40px;
     background-color: #000;
+    color: #fff;
+    font-size: 22px;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.form__btn--gray {
+    padding: 10px 40px;
+    background-color: #696969;
     color: #fff;
     font-size: 22px;
     font-weight: bold;
