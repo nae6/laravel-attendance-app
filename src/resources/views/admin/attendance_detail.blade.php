@@ -143,6 +143,7 @@
                     @error("breaks.$breakCount.break_end")
                     <p class="form__error">{{ $message }}</p>
                     @enderror
+                </div>
             </td>
         </tr>
         <tr class="table__row">
@@ -158,7 +159,7 @@
         </tr>
     </table>
     <div class="btn-wrapper">
-        <button type="submit" class="btn">修正</button>
+        <button type="submit" class="form__btn">修正</button>
     </div>
 </form>
 @endif
