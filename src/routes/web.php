@@ -77,6 +77,10 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         ->name('admin.attendance.update');
     Route::get('/admin/stamp_correction_request/list', [AdminAttendanceCorrectController::class, 'index'])
         ->name('admin.request.list');
+    Route::get('/stamp_correction_request/approve/{attendance_correct_request}', [AdminAttendanceCorrectController::class, 'show'])
+        ->name('admin.request.show');
+    Route::put('/stamp_correction_request/approve/{attendance_correct_request}', [AdminAttendanceCorrectController::class, 'approve'])
+        ->name('admin.request.approve');
 
     Route::get('/admin/staff/list', [AdminStaffController::class, 'staffList'])
         ->name('staff.list');

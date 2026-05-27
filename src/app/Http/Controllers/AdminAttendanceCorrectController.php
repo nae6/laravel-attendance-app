@@ -146,8 +146,68 @@ class AdminAttendanceCorrectController extends Controller
         return view('common.stamp_correct_request', compact('pendingRequests', 'approvedRequests'));
     }
 
+    /**
+     * 修正申請の承認画面表示
+     */
+    public function show() {
 
-    // 修正申請の承認
-    // 承認後に勤怠データへ反映
+    }
+
+
+    /**
+     * 修正申請の承認
+     *
+     * @return RedirectResponse
+     */
+    public function approve(AttendanceCorrectRequest $attendanceCorrectRequest): RedirectResponse {
+        if ($attendanceCorrectRequest->approval_status === AttendanceCorrectRequest::STATUS_APPROVED) {
+            return back()->withErrors([
+                'system_error' => 'この申請はすでに承認済みです',
+            ]);
+        }
+
+        try {
+            DB::transaction(function () use ($attendanceCorrectRequest) {
+
+                $attendanceCorrectRequest->update([
+                    'approval_status' => AttendanceCorrectRequest::STATUS_APPROVED,
+                ]);
+
+                // attendancesテーブルの更新
+                $attendance = $attendanceCorrectRequest->attendance;
+
+                $attendance->update([
+                    'check_in' => $attendanceCorrectRequest->requested_check_in,
+                    'check_out' => $attendanceCorrectRequest->requested_check_out,
+                ]);
+
+                // break_recordsテーブルの更新
+                $attendance->breakRecords()->delete();
+
+                foreach ($attendanceCorrectRequest->breakCorrectRequests as $break) {
+                    if (empty($break->requested_break_start) && empty($break->requested_break_end)) {
+                        continue;
+                    }
+
+                    $attendance->breakRecords()->create([
+                        'break_start' => $break->requested_break_start,
+                        'break_end' => $break->requested_break_end,
+                    ]);
+                }
+            });
+
+            return redirect()->route('admin.request.list')->with('success', '申請を承認しました');
+
+        } catch (\Exception $e) {
+            Log::error('管理者による修正承認に失敗', [
+                'attendance_correct_request_id' => $attendanceCorrectRequest->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->withErrors([
+                'system_error' => '承認処理に失敗しました',
+            ]);
+        }
+    }
 }
 
