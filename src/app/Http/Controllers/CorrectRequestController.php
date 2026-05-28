@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Models\AttendanceCorrectRequest;
 use App\Models\BreakCorrectRequest;
@@ -60,25 +61,32 @@ class CorrectRequestController extends Controller
     }
 
     /**
-     * 申請一覧の表示(user)
+     * 申請一覧の表示(user/admin共通)
      *
      * @return View
      */
-    public function index(): View {
+    public function index(Request $request): View {
+        $viewType = $request->attributes->get('view_type');
+
+        $baseQuery = AttendanceCorrectRequest::with('attendance.user')
+            ->latest('created_at');
+
+        if ($viewType === 'user') {
+            $baseQuery->forUser(Auth::id());
+        }
+
         // 承認待ち
-        $pendingRequests = AttendanceCorrectRequest::with('attendance.user')
-            ->forUser(Auth::id())
+        $pendingRequests = (clone $baseQuery)
             ->where('approval_status', AttendanceCorrectRequest::STATUS_PENDING)
             ->latest('created_at')
             ->get();
 
         // 承認済
-        $approvedRequests = AttendanceCorrectRequest::with(['attendance.user'])
-            ->forUser(Auth::id())
+        $approvedRequests = (clone $baseQuery)
             ->where('approval_status', AttendanceCorrectRequest::STATUS_APPROVED)
             ->latest('created_at')
             ->get();
 
-        return view('common.stamp_correct_request', compact('pendingRequests', 'approvedRequests'));
+        return view('common.request_history', compact('pendingRequests', 'approvedRequests', 'viewType'));
     }
 }
