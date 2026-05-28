@@ -60,6 +60,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::put('/attendance/detail/{attendance}', [CorrectRequestController::class, 'update'])
         ->name('attendance.update');
+});
+
+/**
+ * ログイン済ユーザー共通
+ */
+Route::middleware(['auth', 'verified', 'switch.display'])->group(function () {
     Route::get('/stamp_correction_request/list', [CorrectRequestController::class, 'index'])
         ->name('request.list');
 });
@@ -75,8 +81,6 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 
     Route::put('/admin/attendance/detail/{attendance}', [AdminAttendanceCorrectController::class, 'update'])
         ->name('admin.attendance.update');
-    Route::get('/admin/stamp_correction_request/list', [AdminAttendanceCorrectController::class, 'index'])
-        ->name('admin.request.list');
     Route::get('/stamp_correction_request/approve/{attendance_correct_request}', [AdminAttendanceCorrectController::class, 'show'])
         ->name('admin.request.show');
     Route::put('/stamp_correction_request/approve/{attendance_correct_request}', [AdminAttendanceCorrectController::class, 'approve'])

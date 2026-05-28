@@ -55,4 +55,12 @@ class User extends Authenticatable implements MustVerifyEmail
     public function attendances(): HasMany {
         return $this->hasMany(Attendance::class);
     }
+
+    /**
+     * 管理者判定
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
 }
