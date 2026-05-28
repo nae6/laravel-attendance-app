@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AttendanceCorrectRequestFormRequest;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -120,39 +121,30 @@ class AdminAttendanceCorrectController extends Controller
     /**
      * 勤務時間の入力に日付を付加
      */
-    private function toDateTime(string $date, string $time): Carbon
-    {
+    private function toDateTime(string $date, string $time): Carbon {
         return Carbon::parse("$date $time");
-    }
-
-    /**
-     * 申請一覧の表示(admin)
-     *
-     * @return View
-     */
-    public function index(): View {
-        // 承認待ち
-        $pendingRequests = AttendanceCorrectRequest::with('attendance.user')
-            ->where('approval_status', AttendanceCorrectRequest::STATUS_PENDING)
-            ->latest('created_at')
-            ->get();
-
-        // 承認済
-        $approvedRequests = AttendanceCorrectRequest::with(['attendance.user'])
-            ->where('approval_status', AttendanceCorrectRequest::STATUS_APPROVED)
-            ->latest('created_at')
-            ->get();
-
-        return view('common.stamp_correct_request', compact('pendingRequests', 'approvedRequests'));
     }
 
     /**
      * 修正申請の承認画面表示
      */
-    public function show() {
+    public function show(AttendanceCorrectRequest $attendanceCorrectRequest): View {
+        $attendanceCorrectRequest->load(['attendance.user', 'breakCorrectRequests']);
 
+        $attendance = $attendanceCorrectRequest->attendance;
+        $correctRequest = $attendanceCorrectRequest;
+
+        $displayBreaks = $correctRequest->breakCorrectRequests;
+
+        $breakCount = $displayBreaks->count();
+
+        return view('admin.request_approve', compact(
+            'attendance',
+            'breakCount',
+            'correctRequest',
+            'displayBreaks'
+        ));
     }
-
 
     /**
      * 修正申請の承認

@@ -74,7 +74,9 @@
     </tr>
 </table>
 
-<form method="POST" action="{{ route('admin.request.update') }}" class="btn-wrapper">
+<form method="POST" action="{{ route('admin.request.approve', $correctRequest) }}" class="btn-wrapper">
+    @csrf
+    @method('PUT')
     <button type="submit" class="form__btn">承認</button>
 </form>
 
