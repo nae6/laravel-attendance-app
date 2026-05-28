@@ -9,6 +9,12 @@
 @section('content')
 <h1 class="content-title">申請一覧</h1>
 
+@if (session('success'))
+<div class="success-message">
+    {{ session('success') }}
+</div>
+@endif
+
 <div class="tabs">
     <label>
         <input type="radio" name="tab" checked>
