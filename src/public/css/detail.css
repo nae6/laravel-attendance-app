@@ -68,6 +68,11 @@ input[type="time"] {
     display: block;
 }
 
+.reason {
+    width: 65%;
+    
+}
+
 .form__error {
     margin-top: 8px;
     color: #ff0000;
