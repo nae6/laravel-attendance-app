@@ -89,6 +89,7 @@ input[type="time"] {
 }
 
 .form__btn--gray {
+    display: inline-block;
     padding: 10px 40px;
     background-color: #696969;
     color: #fff;
