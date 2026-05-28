@@ -159,6 +159,8 @@ class AdminAttendanceCorrectController extends Controller
         }
 
         try {
+            $attendanceCorrectRequest->load(['attendance', 'breakCorrectRequests']);
+
             DB::transaction(function () use ($attendanceCorrectRequest) {
 
                 $attendanceCorrectRequest->update([
@@ -188,7 +190,7 @@ class AdminAttendanceCorrectController extends Controller
                 }
             });
 
-            return redirect()->route('admin.request.list')->with('success', '申請を承認しました');
+            return redirect()->route('request.list')->with('success', '申請を承認しました');
 
         } catch (\Exception $e) {
             Log::error('管理者による修正承認に失敗', [

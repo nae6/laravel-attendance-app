@@ -67,21 +67,22 @@
     <tr class="table__row">
         <th>備考</th>
         <td>
-            <textarea name="reason" class="note__content">
-            {{ old('reason') }}
-            </textarea>
+            <p name="reason" class="reason">
+            {{ $correctRequest->reason }}
+            </p>
         </td>
     </tr>
 </table>
 
+@if($correctRequest->isApproved())
+<div class="btn-wrapper">
+    <p class="form__btn--gray">承認済み</p>
+</div>
+@else
 <form method="POST" action="{{ route('admin.request.approve', $correctRequest) }}" class="btn-wrapper">
     @csrf
     @method('PUT')
     <button type="submit" class="form__btn">承認</button>
 </form>
-
-<div class="btn-wrapper">
-    <p class="form__btn--gray">承認済み</p>
-</div>
-
+@endif
 @endsection

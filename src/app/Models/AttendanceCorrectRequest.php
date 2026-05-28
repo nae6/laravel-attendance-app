@@ -72,4 +72,12 @@ class AttendanceCorrectRequest extends Model
     public function attendance(): BelongsTo {
         return $this->belongsTo(Attendance::class);
     }
+
+    /**
+     * 承認済かどうか判定
+     */
+    public function isApproved(): bool
+    {
+        return $this->approval_status === self::STATUS_APPROVED;
+    }
 }
