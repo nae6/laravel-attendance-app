@@ -22,6 +22,7 @@ class AttendanceCorrectRequestFormRequest extends FormRequest
      */
     public function rules(): array {
         return [
+            'date' => 'required',
             'check_in' => 'required|date_format:H:i|before:check_out',
             'check_out' => 'required|date_format:H:i|after:check_in',
 
