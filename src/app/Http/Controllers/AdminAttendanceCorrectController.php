@@ -169,7 +169,7 @@ class AdminAttendanceCorrectController extends Controller
 
                 // attendancesテーブルの更新
                 $attendance = $attendanceCorrectRequest->attendance;
-
+                dd($attendance);
                 $attendance->update([
                     'check_in' => $attendanceCorrectRequest->requested_check_in,
                     'check_out' => $attendanceCorrectRequest->requested_check_out,

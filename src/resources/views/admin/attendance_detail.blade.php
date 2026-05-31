@@ -75,6 +75,7 @@
         <tr class="table__row">
             <th>日付</th>
             <td>
+                <input type="hidden" name="date" value="{{ $attendance->check_in->format('Y-m-d') }}">
                 <span>
                     {{ $attendance?->check_in->format('Y年') }}
                 </span>
@@ -87,7 +88,6 @@
             <th>出勤・退勤</th>
             <td>
                 <div class="time-input">
-                    <input type="hidden" name="date" value="{{ $attendance->check_in->format('Y-m-d') }}">
                     <input type="time" name="check_in" value="{{ old('check_in', $attendance->check_in->format('H:i')) }}">
                     <span>〜</span>
                     <input type="time" name="check_out" value="{{ old('check_out', $attendance->check_out?->format('H:i')) }}">
