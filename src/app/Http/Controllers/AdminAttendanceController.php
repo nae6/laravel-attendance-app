@@ -40,6 +40,9 @@ class AdminAttendanceController extends Controller
         // 未承認の修正申請を取得
         $correctRequest = $attendance->pendingCorrectRequest();
 
+        // 表示用の勤怠データ
+        $displayAttendance = $correctRequest? $correctRequest: $attendance->format('H:i');
+
         // 表示用の休憩データ
         $displayBreaks = $correctRequest
             ? $correctRequest->breakCorrectRequests
@@ -50,7 +53,7 @@ class AdminAttendanceController extends Controller
         return view('admin.attendance_detail', compact(
             'attendance',
             'breakCount',
-            'correctRequest',
+            'displayAttendance',
             'displayBreaks'
         ));
     }
