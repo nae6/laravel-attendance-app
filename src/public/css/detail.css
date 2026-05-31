@@ -38,6 +38,17 @@ table {
     color: #000;
 }
 
+.table__date--space {
+    padding: 2px 20px;
+}
+
+.datetime {
+    width: 60%;
+    display: flex;
+    justify-content: space-between;
+}
+
+
 .time-input {
     margin: 16px 0;
     display: flex;
@@ -50,6 +61,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 input[type="time"] {
+    padding: 2px 20px;
     border: 1px solid #e1e1e1;
     border-radius: 4px;
     text-align: center;
@@ -63,14 +75,16 @@ input[type="time"] {
     width: 65%;
     height: 80px;
     margin: 20px 0;
+    padding: 8px;
     border: 1px solid #d9d9d9;
     border-radius: 10px;
     display: block;
+    box-sizing: border-box;
+    line-height: 1.5;
 }
 
 .reason {
     width: 65%;
-    
 }
 
 .form__error {
