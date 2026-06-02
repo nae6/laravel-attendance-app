@@ -88,7 +88,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 
     Route::get('/admin/staff/list', [AdminStaffController::class, 'staffList'])
         ->name('staff.list');
-    Route::get('/admin/attendance/staff/{staff}', [AdminStaffController::class, 'attendanceHistory'])
+    Route::get('/admin/attendance/staff/{staff}', [AdminStaffController::class, 'index'])
         ->name('staff.attendance.list');
     Route::get('/admin/attendance/staff/{staff}/export', [AdminStaffController::class, 'export'])
         ->name('staff.attendance.export');
