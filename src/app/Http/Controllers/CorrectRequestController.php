@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Enums\AttendanceCorrectRequestStatus;
 use App\Models\AttendanceCorrectRequest;
 use App\Models\BreakCorrectRequest;
 use App\Models\Attendance;
@@ -75,16 +76,12 @@ class CorrectRequestController extends Controller
             $baseQuery->forUser(Auth::id());
         }
 
-        // 承認待ち
         $pendingRequests = (clone $baseQuery)
-            ->where('approval_status', AttendanceCorrectRequest::STATUS_PENDING)
-            ->latest('created_at')
+            ->where('approval_status', AttendanceCorrectRequestStatus::Pending)
             ->get();
 
-        // 承認済
         $approvedRequests = (clone $baseQuery)
-            ->where('approval_status', AttendanceCorrectRequest::STATUS_APPROVED)
-            ->latest('created_at')
+            ->where('approval_status', AttendanceCorrectRequestStatus::Approved)
             ->get();
 
         return view('common.request_history', compact('pendingRequests', 'approvedRequests', 'viewType'));

@@ -48,10 +48,8 @@ class AttendanceController extends Controller
 
         $attendance->load(['user', 'breakRecords']);
 
-        // 未承認の修正申請を取得
         $correctRequest = $attendance->pendingCorrectRequest();
 
-        // 表示用の休憩データ
         $displayBreaks = $correctRequest
             ? $correctRequest->breakCorrectRequests
             : $attendance->breakRecords;
