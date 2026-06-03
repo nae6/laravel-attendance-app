@@ -2,9 +2,10 @@
 
 namespace Database\Factories;
 
+use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Enums\AttendanceCorrectRequestStatus;
 use App\Models\Attendance;
 use App\Models\AttendanceCorrectRequest;
-use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends Factory<AttendanceCorrectRequest>
@@ -27,21 +28,21 @@ class AttendanceCorrectRequestFactory extends Factory
                 '退勤時刻を誤って登録したため',
                 '休憩時間の修正のため',
             ]),
-            'approval_status' => AttendanceCorrectRequest::STATUS_PENDING,
+            'approval_status' => AttendanceCorrectRequestStatus::Pending,
         ];
     }
 
     // 未承認
     public function pending(): static {
         return $this->state(fn() => [
-            'approval_status' => AttendanceCorrectRequest::STATUS_PENDING,
+            'approval_status' => AttendanceCorrectRequestStatus::Pending,
         ]);
     }
 
     // 承認
     public function approved(): static {
         return $this->state(fn() => [
-            'approval_status' => AttendanceCorrectRequest::STATUS_APPROVED,
+            'approval_status' => AttendanceCorrectRequestStatus::Approved,
         ]);
     }
 }

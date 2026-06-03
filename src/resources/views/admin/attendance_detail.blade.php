@@ -17,24 +17,34 @@
 <table class="table__wrapper font-setting">
     <tr class="table__row">
         <th>名前</th>
-        <td>{{ $attendance->user->name }}</td>
+        <td class="table__date--space">{{ $attendance->user->name }}</td>
     </tr>
 
     <tr class="table__row">
         <th>日付</th>
         <td>
-            <span>{{ $attendance?->check_in->format('Y年') }}</span>
-            <span>{{ $attendance?->check_in->format('n月j日') }}</span>
+            <div class="datetime">
+                <span class="table__date--space">
+                    {{ $attendance?->check_in->format('Y年') }}
+                </span>
+                <span class="table__date--space">
+                    {{ $attendance?->check_in->format('n月j日') }}
+                </span>
+            </div>
         </td>
     </tr>
 
     <tr class="table__row">
         <th>出勤・退勤</th>
         <td>
-            <div class="time-input">
-                <span>{{ $correctRequest->requested_check_in?->format('H:i') }}</span>
+            <div class="time-input datetime">
+                <span class="table__date--space">
+                    {{ $correctRequest->requested_check_in?->format('H:i') }}
+                </span>
                 <span>〜</span>
-                <span>{{ $correctRequest->requested_check_out?->format('H:i') }}</span>
+                <span class="table__date--space">
+                    {{ $correctRequest->requested_check_out?->format('H:i') }}
+                </span>
             </div>
         </td>
     </tr>
@@ -43,10 +53,14 @@
     <tr class="table__row">
         <th>休憩{{ $index === 0 ? '' : $index + 1 }}</th>
         <td>
-            <div class="time-input">
-                <span>{{ $break->requested_break_start?->format('H:i') }}</span>
+            <div class="time-input datetime">
+                <span class="table__date--space">
+                    {{ $break->requested_break_start?->format('H:i') }}
+                </span>
                 <span>〜</span>
-                <span>{{ $break->requested_break_end?->format('H:i') }}</span>
+                <span class="table__date--space">
+                    {{ $break->requested_break_end?->format('H:i') }}
+                </span>
             </div>
         </td>
     </tr>
@@ -64,30 +78,32 @@
 </div>
 
 @elseif($attendance)
-<form action="{{ route('admin.attendance.update', $attendance->id) }}" method="POST">
+<form action="{{ route('admin.attendance.update', $attendance->id) }}" method="POST" novalidate>
     @method('PUT')
     @csrf
     <table class="table__wrapper font-setting">
         <tr class="table__row">
             <th>名前</th>
-            <td>{{ $attendance->user->name }}</td>
+            <td class="table__date--space">{{ $attendance->user->name }}</td>
         </tr>
         <tr class="table__row">
             <th>日付</th>
             <td>
                 <input type="hidden" name="date" value="{{ $attendance->check_in->format('Y-m-d') }}">
-                <span>
-                    {{ $attendance?->check_in->format('Y年') }}
-                </span>
-                <span>
-                    {{ $attendance?->check_in->format('n月j日') }}
-                </span>
+                <div class="datetime">
+                    <span class="table__date--space">
+                        {{ $attendance?->check_in->format('Y年') }}
+                    </span>
+                    <span class="table__date--space">
+                        {{ $attendance?->check_in->format('n月j日') }}
+                    </span>
+                </div>
             </td>
         </tr>
         <tr class="table__row">
             <th>出勤・退勤</th>
             <td>
-                <div class="time-input">
+                <div class="time-input datetime">
                     <input type="time" name="check_in" value="{{ old('check_in', $attendance->check_in->format('H:i')) }}">
                     <span>〜</span>
                     <input type="time" name="check_out" value="{{ old('check_out', $attendance->check_out?->format('H:i')) }}">
@@ -105,7 +121,7 @@
         <tr class="table__row">
             <th>休憩{{ $index === 0 ? '' : $index + 1 }}</th>
             <td>
-                <div class="time-input">
+                <div class="time-input datetime">
                     <input type="time"
                         name="breaks[{{ $index }}][break_start]"
                         value="{{ old("breaks.$index.break_start", $break->break_start?->format('H:i')) }}">
@@ -130,7 +146,7 @@
         <tr class="table__row">
             <th>休憩{{ $breakCount + 1 }}</th>
             <td>
-                <div class="time-input">
+                <div class="time-input datetime">
                     <input type="time" name="breaks[{{ $breakCount }}][break_start]" value="{{ old("breaks.$breakCount.break_start") }}">
                     <span>〜</span>
                     <input type="time" name="breaks[{{ $breakCount }}][break_end]" value="{{ old("breaks.$breakCount.break_end") }}">
@@ -149,9 +165,7 @@
         <tr class="table__row">
             <th>備考</th>
             <td>
-                <textarea name="reason" class="note__content">
-                {{ old('reason') }}
-                </textarea>
+                <textarea name="reason" class="note__content">{{ old('reason') }}</textarea>
                 @error('reason')
                 <p class="form__error">{{ $message }}</p>
                 @enderror
