@@ -38,8 +38,6 @@ class AdminAttendanceController extends Controller
 
         $correctRequest = $attendance->pendingCorrectRequest();
 
-        $displayAttendance = $correctRequest? $correctRequest: $attendance->format('H:i');
-
         $displayBreaks = $correctRequest
             ? $correctRequest->breakCorrectRequests
             : $attendance->breakRecords;
@@ -49,7 +47,7 @@ class AdminAttendanceController extends Controller
         return view('admin.attendance_detail', compact(
             'attendance',
             'breakCount',
-            'displayAttendance',
+            'correctRequest',
             'displayBreaks'
         ));
     }

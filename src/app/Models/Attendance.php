@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\AttendanceCorrectRequestStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -83,7 +84,7 @@ class Attendance extends Model
     public function pendingCorrectRequest(): ?AttendanceCorrectRequest {
         return $this->correctRequests()
             ->with('breakCorrectRequests')
-            ->where('approval_status', AttendanceCorrectRequest::STATUS_PENDING)
+            ->where('approval_status', AttendanceCorrectRequestStatus::Pending)
             ->latest()
             ->first();
     }
