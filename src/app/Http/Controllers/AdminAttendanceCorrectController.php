@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AttendanceCorrectRequestFormRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use App\Enums\AttendanceCorrectRequestStatus;
 use App\Models\AttendanceCorrectRequest;
 use App\Models\BreakCorrectRequest;
 use App\Models\Attendance;
@@ -61,7 +61,7 @@ class AdminAttendanceCorrectController extends Controller
             'requested_check_in' => $this->toDateTime($validated['date'], $validated['check_in']),
             'requested_check_out' => $this->toDateTime($validated['date'], $validated['check_out']),
             'reason' => $validated['reason'],
-            'approval_status' => AttendanceCorrectRequest::STATUS_APPROVED,
+            'approval_status' => AttendanceCorrectRequestStatus::Approved,
         ]);
     }
 
@@ -152,7 +152,7 @@ class AdminAttendanceCorrectController extends Controller
      * @return RedirectResponse
      */
     public function approve(AttendanceCorrectRequest $attendanceCorrectRequest): RedirectResponse {
-        if ($attendanceCorrectRequest->approval_status === AttendanceCorrectRequest::STATUS_APPROVED) {
+        if ($attendanceCorrectRequest->approval_status === AttendanceCorrectRequestStatus::Approved) {
             return back()->withErrors([
                 'system_error' => 'この申請はすでに承認済みです',
             ]);
@@ -164,28 +164,25 @@ class AdminAttendanceCorrectController extends Controller
             DB::transaction(function () use ($attendanceCorrectRequest) {
 
                 $attendanceCorrectRequest->update([
-                    'approval_status' => AttendanceCorrectRequest::STATUS_APPROVED,
+                    'approval_status' => AttendanceCorrectRequestStatus::Approved,
                 ]);
 
-                // attendancesテーブルの更新
                 $attendance = $attendanceCorrectRequest->attendance;
-                dd($attendance);
                 $attendance->update([
-                    'check_in' => $attendanceCorrectRequest->requested_check_in,
-                    'check_out' => $attendanceCorrectRequest->requested_check_out,
+                    'check_in' => $attendanceCorrectRequest['requested_check_in'],
+                    'check_out' => $attendanceCorrectRequest['requested_check_out'],
                 ]);
 
-                // break_recordsテーブルの更新
                 $attendance->breakRecords()->delete();
 
                 foreach ($attendanceCorrectRequest->breakCorrectRequests as $break) {
-                    if (empty($break->requested_break_start) && empty($break->requested_break_end)) {
+                    if (empty($break['requested_break_start']) && empty($break['requested_break_end'])) {
                         continue;
                     }
 
                     $attendance->breakRecords()->create([
-                        'break_start' => $break->requested_break_start,
-                        'break_end' => $break->requested_break_end,
+                        'break_start' => $break['requested_break_start'],
+                        'break_end' => $break['requested_break_end'],
                     ]);
                 }
             });

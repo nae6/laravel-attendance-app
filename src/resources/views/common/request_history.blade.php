@@ -33,20 +33,20 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($pendingRequests as $correctRequest)
+                @forelse($pendingRequests as $pendingRequest)
                 <tr class="table__inner">
-                    <td>{{ $correctRequest->status_label }}</td>
-                    <td>{{ $correctRequest->attendance->user->name }}</td>
-                    <td>{{ $correctRequest->requested_check_in->format('Y/m/d') }}</td>
-                    <td>{{ $correctRequest->reason }}</td>
-                    <td>{{ $correctRequest->created_at->format('Y/m/d') }}</td>
+                    <td>{{ $pendingRequest->status_label }}</td>
+                    <td>{{ $pendingRequest->attendance->user->name }}</td>
+                    <td>{{ $pendingRequest->requested_check_in->format('Y/m/d') }}</td>
+                    <td>{{ $pendingRequest->reason }}</td>
+                    <td>{{ $pendingRequest->created_at->format('Y/m/d') }}</td>
                     @if(auth()->user()->isAdmin())
                     <td class="detail__link">
-                        <a href="{{ route('admin.request.show', $correctRequest) }}">詳細</a>
+                        <a href="{{ route('admin.request.show', ['attendance_correct_request' => $pendingRequest->id]) }}">詳細</a>
                     </td>
                     @else
                     <td class="detail__link">
-                        <a href="{{ route('attendance.edit', $correctRequest->attendance) }}">詳細</a>
+                        <a href="{{ route('attendance.edit', $pendingRequest->attendance->id) }}">詳細</a>
                     </td>
                     @endif
                 </tr>
@@ -76,20 +76,20 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($approvedRequests as $correctRequest)
+                @forelse($approvedRequests as $approvedRequest)
                 <tr class="table__inner">
-                    <td>{{ $correctRequest->status_label }}</td>
-                    <td>{{ $correctRequest->attendance->user->name }}</td>
-                    <td>{{ $correctRequest->requested_check_in->format('Y/m/d') }}</td>
-                    <td>{{ $correctRequest->reason }}</td>
-                    <td>{{ $correctRequest->created_at->format('Y/m/d') }}</td>
+                    <td>{{ $approvedRequest->status_label }}</td>
+                    <td>{{ $approvedRequest->attendance->user->name }}</td>
+                    <td>{{ $approvedRequest->requested_check_in->format('Y/m/d') }}</td>
+                    <td>{{ $approvedRequest->reason }}</td>
+                    <td>{{ $approvedRequest->created_at->format('Y/m/d') }}</td>
                     @if(auth()->user()->isAdmin())
                     <td class="detail__link">
-                        <a href="{{ route('admin.request.show', $correctRequest) }}">詳細</a>
+                        <a href="{{ route('admin.request.show', $approvedRequest) }}">詳細</a>
                     </td>
                     @else
                     <td class="detail__link">
-                        <a href="{{ route('attendance.edit', $correctRequest->attendance) }}">詳細</a>
+                        <a href="{{ route('attendance.edit', $approvedRequest->attendance) }}">詳細</a>
                     </td>
                     @endif
                 </tr>
