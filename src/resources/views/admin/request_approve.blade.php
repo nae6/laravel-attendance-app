@@ -22,10 +22,10 @@
         <th>日付</th>
         <td>
             <span>
-                {{ $attendance->check_in->format('Y年') }}
+                {{ $correctRequest->requested_check_in->format('Y年') }}
             </span>
             <span>
-                {{ $attendance->check_in->format('n月j日') }}
+                {{ $correctRequest->requested_check_in->format('n月j日') }}
             </span>
         </td>
     </tr>
@@ -33,21 +33,21 @@
         <th>出勤・退勤</th>
         <td>
             <div class="time-input">
-                <span>{{ $attendance->check_in->format('H:i') }}</span>
+                <span>{{ $correctRequest->requested_check_in->format('H:i') }}</span>
                 <span>〜</span>
-                <span>{{ $attendance->check_out?->format('H:i') }}</span>
+                <span>{{ $correctRequest->requested_check_out?->format('H:i') }}</span>
             </div>
         </td>
     </tr>
 
-    @forelse ($attendance->breakRecords as $index => $break)
+    @forelse ($displayBreaks as $index => $break)
     <tr class="table__row">
         <th>休憩{{ $index === 0 ? '' : $index + 1 }}</th>
         <td>
             <div class="time-input">
-                <span>{{ $break->break_start?->format('H:i') }}</span>
+                <span>{{ $break->requested_break_start?->format('H:i') }}</span>
                 <span>〜</span>
-                <span>{{ $break->break_end?->format('H:i') }}</span>
+                <span>{{ $break->requested_break_end?->format('H:i') }}</span>
             </div>
         </td>
     </tr>
@@ -68,7 +68,7 @@
         <th>備考</th>
         <td>
             <p name="reason" class="reason">
-            {{ $correctRequest->reason }}
+                {{ $correctRequest->reason }}
             </p>
         </td>
     </tr>

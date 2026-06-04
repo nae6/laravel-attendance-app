@@ -167,25 +167,22 @@ class AdminAttendanceCorrectController extends Controller
                     'approval_status' => AttendanceCorrectRequestStatus::Approved,
                 ]);
 
-                // attendancesテーブルの更新
                 $attendance = $attendanceCorrectRequest->attendance;
-                dd($attendance);
                 $attendance->update([
-                    'check_in' => $attendanceCorrectRequest->requested_check_in,
-                    'check_out' => $attendanceCorrectRequest->requested_check_out,
+                    'check_in' => $attendanceCorrectRequest['requested_check_in'],
+                    'check_out' => $attendanceCorrectRequest['requested_check_out'],
                 ]);
 
-                // break_recordsテーブルの更新
                 $attendance->breakRecords()->delete();
 
                 foreach ($attendanceCorrectRequest->breakCorrectRequests as $break) {
-                    if (empty($break->requested_break_start) && empty($break->requested_break_end)) {
+                    if (empty($break['requested_break_start']) && empty($break['requested_break_end'])) {
                         continue;
                     }
 
                     $attendance->breakRecords()->create([
-                        'break_start' => $break->requested_break_start,
-                        'break_end' => $break->requested_break_end,
+                        'break_start' => $break['requested_break_start'],
+                        'break_end' => $break['requested_break_end'],
                     ]);
                 }
             });
