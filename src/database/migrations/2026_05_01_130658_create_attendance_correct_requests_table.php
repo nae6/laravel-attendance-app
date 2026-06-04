@@ -19,7 +19,7 @@ return new class extends Migration
             $table->timestamp('requested_check_in')->nullable();
             $table->timestamp('requested_check_out')->nullable();
             $table->text('reason');
-            $table->string('approval_status')->default('pending');
+            $table->enum('approval_status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
 
             $table->index('attendance_id');

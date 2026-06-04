@@ -18,8 +18,7 @@ class AttendanceActionController extends Controller
      *
      * @return View
      */
-    public function edit(): View
-    {
+    public function edit(): View {
         $userId = Auth::id();
 
         $attendance = Attendance::where('user_id', $userId)
@@ -45,8 +44,7 @@ class AttendanceActionController extends Controller
      *
      * @return RedirectResponse
      */
-    public function startWork(): RedirectResponse
-    {
+    public function startWork(): RedirectResponse {
         $userId = Auth::id();
 
         $exists = Attendance::where('user_id', $userId)
@@ -72,8 +70,7 @@ class AttendanceActionController extends Controller
      *
      * @return RedirectResponse
      */
-    public function startBreak(): RedirectResponse
-    {
+    public function startBreak(): RedirectResponse {
         $userId = Auth::id();
 
         $attendance = Attendance::where('user_id', $userId)
@@ -117,8 +114,7 @@ class AttendanceActionController extends Controller
      *
      * @return RedirectResponse
      */
-    public function endBreak(): RedirectResponse
-    {
+    public function endBreak(): RedirectResponse {
         $userId = Auth::id();
 
         $attendance = Attendance::where('user_id', $userId)
@@ -170,8 +166,7 @@ class AttendanceActionController extends Controller
      *
      * @return RedirectResponse
      */
-    public function endWork(Attendance $attendance): RedirectResponse
-    {
+    public function endWork(Attendance $attendance): RedirectResponse {
         $userId = Auth::id();
 
         $attendance = Attendance::where('user_id', $userId)

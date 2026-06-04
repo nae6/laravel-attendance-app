@@ -30,7 +30,7 @@ class AdminStaffController extends Controller
      *
      * @return View
      */
-    public function attendanceHistory(Request $request, User $staff): View {
+    public function index(Request $request, User $staff): View {
         abort_if($staff->role !== 'user', 404);
 
         $monthData = $this->getMonthData($request);

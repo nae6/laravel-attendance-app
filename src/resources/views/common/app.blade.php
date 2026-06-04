@@ -14,7 +14,7 @@
 <body>
     <header class="header">
         <div class="header__inner">
-            <a href="/" class="header__logo">
+            <a href="{{ route('attendance') }}" class="header__logo">
                 <img src="{{ asset('images/header_logo.png') }}" alt="coachtech logo">
             </a>
             @auth
