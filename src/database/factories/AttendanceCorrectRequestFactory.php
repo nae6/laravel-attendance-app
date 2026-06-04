@@ -19,10 +19,19 @@ class AttendanceCorrectRequestFactory extends Factory
      */
     public function definition(): array
     {
+        $date = fake()->dateTimeBetween('-1 month', 'now');
+
+        $checkIn = (clone $date)->setTime(
+            rand(8, 10),
+            rand(0, 59)
+        );
+
+        $checkOut = (clone $checkIn)->modify('+' . rand(1, 10) . ' hours');
+
         return [
             'attendance_id' => Attendance::factory(),
-            'requested_check_in' => fake()->dateTimeBetween('-1 month', 'now'),
-            'requested_check_out' => fake()->dateTimeBetween('now', '+1 month'),
+            'requested_check_in' => $checkIn,
+            'requested_check_out' => $checkOut,
             'reason' => fake()->randomElement([
                 '打刻漏れのため',
                 '退勤時刻を誤って登録したため',
