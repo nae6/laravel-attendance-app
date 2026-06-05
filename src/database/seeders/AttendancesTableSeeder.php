@@ -16,7 +16,7 @@ class AttendancesTableSeeder extends Seeder
      */
     public function run(): void
     {
-        User::all()->each(function ($user) {
+        User::where('role', 'user')->each(function ($user) {
             // 前月の日付一覧
             $base = Carbon::now()->subMonthNoOverflow();
 
