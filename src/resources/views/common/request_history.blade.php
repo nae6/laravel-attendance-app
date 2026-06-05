@@ -17,7 +17,7 @@
 
 <div class="tabs">
     <label>
-        <input type="radio" name="tab" checked>
+        <input type="radio" name="tab" checked id="pending-tab">
         承認待ち
     </label>
     <div class="table__wrapper font-setting tab__inner">
@@ -60,7 +60,7 @@
     </div>
 
     <label>
-        <input type="radio" name="tab">
+        <input type="radio" name="tab" id="approved-tab">
         承認済み
     </label>
     <div class="table__wrapper font-setting tab__inner">
