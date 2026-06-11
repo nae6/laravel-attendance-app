@@ -123,13 +123,6 @@ Docker環境用に以下が設定されています：
 php artisan config:clear
 ```
 
-### 4. データベース初期化
-
-```bash
-php artisan migrate
-php artisan db:seed
-```
-
 ---
 
 ## テスト
