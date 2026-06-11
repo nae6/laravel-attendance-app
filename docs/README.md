@@ -93,7 +93,7 @@ Laravelを用いて開発した勤怠管理アプリです。
 ### 1. リポジトリをクローン
 
 ```bash
-git clone <URL>
+git clone <https://github.com/nae6/laravel-attendance-app.git>
 cd attendance-management-app
 ```
 
@@ -133,10 +133,6 @@ php artisan db:seed
 ---
 
 ## テスト
-
-```bash
-php artisan test
-```
 
 以下は動作確認用のユーザーです。
 
