@@ -93,8 +93,8 @@ Laravelを用いて開発した勤怠管理アプリです。
 ### 1. リポジトリをクローン
 
 ```bash
-git clone <https://github.com/nae6/laravel-attendance-app.git>
-cd attendance-management-app
+git clone https://github.com/nae6/laravel-attendance-app.git
+cd laravel-attendance-app
 ```
 
 ### 2. laravel・Dockerセットアップ
