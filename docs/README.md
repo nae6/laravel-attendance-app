@@ -120,6 +120,7 @@ Docker環境用に以下が設定されています：
 ※設定変更後はキャッシュをクリアしてください
 
 ```bash
+make bash
 php artisan config:clear
 ```
 

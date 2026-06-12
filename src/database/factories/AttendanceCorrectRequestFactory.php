@@ -41,6 +41,18 @@ class AttendanceCorrectRequestFactory extends Factory
         ];
     }
 
+    /**
+     * 指定した勤怠に紐づく修正申請を作成
+     */
+    public function forAttendance(Attendance $attendance): static
+    {
+        return $this->state(fn() => [
+            'attendance_id' => $attendance->id,
+            'requested_check_in' => $attendance->check_in->copy()->addMinutes(15),
+            'requested_check_out' => $attendance->check_out->copy()->addMinutes(15),
+        ]);
+    }
+
     // 未承認
     public function pending(): static {
         return $this->state(fn() => [

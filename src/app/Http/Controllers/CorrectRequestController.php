@@ -13,6 +13,7 @@ use App\Enums\AttendanceCorrectRequestStatus;
 use App\Models\AttendanceCorrectRequest;
 use App\Models\BreakCorrectRequest;
 use App\Models\Attendance;
+use Carbon\Carbon;
 
 class CorrectRequestController extends Controller
 {
@@ -28,10 +29,12 @@ class CorrectRequestController extends Controller
 
         try {
             DB::transaction(function () use ($attendance, $validated) {
+                $attendanceDate = $attendance->check_in->toDateString();
+
                 $correctRequest = AttendanceCorrectRequest::create([
                     'attendance_id' => $attendance->id,
-                    'requested_check_in' => $validated['check_in'],
-                    'requested_check_out' => $validated['check_out'],
+                    'requested_check_in' => Carbon::parse($attendanceDate . ' ' . $validated['check_in']),
+                    'requested_check_out' => Carbon::parse($attendanceDate . ' ' . $validated['check_out']),
                     'reason' => $validated['reason'],
                 ]);
 
@@ -42,8 +45,8 @@ class CorrectRequestController extends Controller
 
                     BreakCorrectRequest::create([
                         'attendance_correct_request_id' => $correctRequest->id,
-                        'requested_break_start' => $break['break_start'],
-                        'requested_break_end' => $break['break_end'],
+                        'requested_break_start' => Carbon::parse($attendanceDate . ' ' . $break['break_start']),
+                        'requested_break_end' => Carbon::parse($attendanceDate . ' ' . $break['break_end']),
                     ]);
                 };
             });
