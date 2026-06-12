@@ -17,22 +17,22 @@ class AttendanceCorrectRequestSeeder extends Seeder
             $query->where('role', 'user');
         })
             ->inRandomOrder()
-            ->take(15)
+            ->take(5)
             ->get();
 
-        // 未承認10件
-        $attendances->take(10)->each(function ($attendance) {
+        // 未承認3件
+        $attendances->take(3)->each(function ($attendance) {
             AttendanceCorrectRequest::factory()
                 ->pending()
-                ->for($attendance)
+                ->forAttendance($attendance)
                 ->create();
         });
 
-        // 承認済5件
-        $attendances->skip(10)->take(5)->each(function ($attendance) {
+        // 承認済2件
+        $attendances->skip(3)->take(2)->each(function ($attendance) {
             AttendanceCorrectRequest::factory()
                 ->approved()
-                ->for($attendance)
+                ->forAttendance($attendance)
                 ->create();
         });
     }
