@@ -79,7 +79,7 @@
 
     <tr class="table__row">
         <th>備考</th>
-        <td class="note">
+        <td>
             {{ $correctRequest->reason }}
         </td>
     </tr>

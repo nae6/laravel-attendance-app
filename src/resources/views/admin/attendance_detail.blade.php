@@ -68,7 +68,7 @@
 
     <tr class="table__row">
         <th>備考</th>
-        <td class="note">
+        <td>
             {{ $correctRequest->reason }}
         </td>
     </tr>
@@ -100,6 +100,7 @@
                 </div>
             </td>
         </tr>
+
         <tr class="table__row">
             <th>出勤・退勤</th>
             <td>
@@ -117,6 +118,7 @@
                 </div>
             </td>
         </tr>
+
         @foreach ($attendance?->breakRecords as $index => $break)
         <tr class="table__row">
             <th>休憩{{ $index === 0 ? '' : $index + 1 }}</th>
@@ -142,6 +144,7 @@
                 </div>
             </td>
         </tr>
+
         @endforeach
         <tr class="table__row">
             <th>休憩{{ $breakCount + 1 }}</th>
@@ -162,6 +165,7 @@
                 </div>
             </td>
         </tr>
+
         <tr class="table__row">
             <th>備考</th>
             <td>
