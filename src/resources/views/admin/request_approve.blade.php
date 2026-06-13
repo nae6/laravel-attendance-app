@@ -16,26 +16,34 @@
 <table class="table__wrapper font-setting">
     <tr class="table__row">
         <th>名前</th>
-        <td>{{ $attendance->user->name }}</td>
+        <td class="table__date--space">{{ $attendance->user->name }}</td>
     </tr>
+
     <tr class="table__row">
         <th>日付</th>
         <td>
-            <span>
-                {{ $correctRequest->requested_check_in->format('Y年') }}
-            </span>
-            <span>
-                {{ $correctRequest->requested_check_in->format('n月j日') }}
-            </span>
+            <div class="datetime">
+                <span class="table__date--space">
+                    {{ $correctRequest->requested_check_in->format('Y年') }}
+                </span>
+                <span class="table__date--space">
+                    {{ $correctRequest->requested_check_in->format('n月j日') }}
+                </span>
+            </div>
         </td>
     </tr>
+
     <tr class="table__row">
         <th>出勤・退勤</th>
         <td>
-            <div class="time-input">
-                <span>{{ $correctRequest->requested_check_in->format('H:i') }}</span>
+            <div class="time-input datetime">
+                <span class="table__date--space">
+                    {{ $correctRequest->requested_check_in->format('H:i') }}
+                </span>
                 <span>〜</span>
-                <span>{{ $correctRequest->requested_check_out?->format('H:i') }}</span>
+                <span class="table__date--space">
+                    {{ $correctRequest->requested_check_out?->format('H:i') }}
+                </span>
             </div>
         </td>
     </tr>
@@ -44,10 +52,14 @@
     <tr class="table__row">
         <th>休憩{{ $index === 0 ? '' : $index + 1 }}</th>
         <td>
-            <div class="time-input">
-                <span>{{ $break->requested_break_start?->format('H:i') }}</span>
+            <div class="time-input datetime">
+                <span class="table__date--space">
+                    {{ $break->requested_break_start?->format('H:i') }}
+                </span>
                 <span>〜</span>
-                <span>{{ $break->requested_break_end?->format('H:i') }}</span>
+                <span class="table__date--space">
+                    {{ $break->requested_break_end?->format('H:i') }}
+                </span>
             </div>
         </td>
     </tr>
@@ -55,10 +67,10 @@
     <tr class="table__row">
         <th>休憩</th>
         <td>
-            <div class="time-input">
-                <span></span>
+            <div class="time-input datetime">
+                <span class="table__date--space"></span>
                 <span>〜</span>
-                <span></span>
+                <span class="table__date--space"></span>
             </div>
         </td>
     </tr>
