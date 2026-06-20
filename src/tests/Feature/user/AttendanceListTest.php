@@ -36,7 +36,8 @@ class AttendanceListTest extends TestCase
             'check_out' => '2026-05-02 17:00:00',
         ]);
 
-        $response = $this->actingAs($user)->get(route('attendance.index'));
+        $response = $this->actingAs($user)
+            ->get(route('attendance.index', ['month' => '2026-05',]));
 
         $response->assertOk();
         $response->assertSee('05/01(金)');

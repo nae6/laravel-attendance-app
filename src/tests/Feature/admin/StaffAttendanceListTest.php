@@ -43,7 +43,10 @@ class StaffAttendanceListTest extends TestCase
         ]);
 
         $response = $this->actingAs($admin)
-            ->get(route('staff.attendance.list', ['staff' => $user->id]));
+            ->get(route('staff.attendance.list', [
+                'staff' => $user->id,
+                'month' => '2026-05',
+            ]));
 
         $response->assertOk();
 
