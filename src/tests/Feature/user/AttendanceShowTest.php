@@ -114,7 +114,7 @@ class AttendanceShowTest extends TestCase
             'break_end' => '2026-05-01 12:00:00',
         ]);
 
-        $response = $this->actingAs($user)->get(route('attendance.index', $attendance->id));
+        $response = $this->actingAs($user)->get(route('attendance.edit', $attendance->id));
 
         $response->assertOk();
         $response->assertSee('11:00');
