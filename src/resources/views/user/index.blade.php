@@ -39,7 +39,7 @@
     @case('休憩中')
     <form action="{{ route('break.end') }}" method="POST" class="form__btn">
         @csrf
-        <button type="submit" class="form__btn--black">休憩戻</button>
+        <button type="submit" class="form__btn--white">休憩戻</button>
     </form>
     @break
     @case('退勤済')
