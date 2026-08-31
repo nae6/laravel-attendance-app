@@ -6,35 +6,27 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Models\Attendance;
-use Carbon\CarbonPeriod;
-use Carbon\Carbon;
+use App\Services\AttendanceService;
 
 class AttendanceController extends Controller
 {
+    public function __construct(
+        private AttendanceService $attendanceService
+    ) {
+    }
+
     /**
      * ログインユーザーの勤怠一覧画面表示
      *
      * @return View
      */
     public function index(Request $request): View {
-        $currentMonth = Carbon::parse($request->input('month', today()->format('Y-m')));
+        $data = $this->attendanceService->getMonthlyAttendanceData(
+            Auth::id(),
+            $request->input('month')
+        );
 
-        $lastMonth = $currentMonth->copy()->subMonth()->format('Y-m');
-        $nextMonth = $currentMonth->copy()->addMonth()->format('Y-m');
-
-        // １ヶ月分の日付取得
-        $startOfMonth = $currentMonth->copy()->startOfMonth();
-        $endOfMonth = $currentMonth->copy()->endOfMonth();
-        $dates = CarbonPeriod::create($startOfMonth, $endOfMonth);
-
-        // １ヶ月分の勤怠データ取得
-        $attendances = Attendance::with('breakRecords')
-            ->where('user_id', Auth::id())
-            ->whereBetween('check_in', [$startOfMonth, $endOfMonth->endOfDay()])
-            ->get()
-            ->keyBy(fn($attendance) => $attendance->check_in->format('Y-m-d'));
-
-        return view('user.history', compact('attendances', 'currentMonth','dates', 'lastMonth', 'nextMonth'));
+        return view('user.history', $data);
     }
 
     /**
@@ -46,21 +38,6 @@ class AttendanceController extends Controller
     public function edit(Attendance $attendance): View {
         abort_if($attendance->user_id !== Auth::id(), 403);
 
-        $attendance->load(['user', 'breakRecords']);
-
-        $correctRequest = $attendance->pendingCorrectRequest();
-
-        $displayBreaks = $correctRequest
-            ? $correctRequest->breakCorrectRequests
-            : $attendance->breakRecords;
-
-        $breakCount = $displayBreaks->count();
-
-        return view('user.detail', compact(
-            'attendance',
-            'breakCount',
-            'correctRequest',
-            'displayBreaks'
-        ));
+        return view('user.detail', $this->attendanceService->getDetailData($attendance));
     }
 }
