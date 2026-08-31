@@ -5,26 +5,26 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Models\Attendance;
-use Carbon\Carbon;
+use App\Services\AttendanceService;
 
 class AdminAttendanceController extends Controller
 {
+    public function __construct(
+        private AttendanceService $attendanceService
+    ) {
+    }
+
     /**
      * 日時勤怠一覧画面の表示
      *
      * @return View
      */
     public function index(Request $request): View {
-        $currentDate = $request->filled('date') ? Carbon::parse($request->date) : today();
+        $data = $this->attendanceService->getDailyAttendanceData(
+            $request->input('date')
+        );
 
-        $lastDate = $currentDate->copy()->subDay()->format('Y-m-d');
-        $nextDate = $currentDate->copy()->addDay()->format('Y-m-d');
-
-        $attendances = Attendance::with(['user', 'breakRecords'])
-            ->whereDate('check_in', $currentDate)
-            ->get();
-
-        return view('admin.attendance_history', compact('attendances', 'currentDate', 'lastDate', 'nextDate'));
+        return view('admin.attendance_history', $data);
     }
 
     /**
@@ -34,21 +34,6 @@ class AdminAttendanceController extends Controller
      * @return View
      */
     public function edit(Attendance $attendance): View {
-        $attendance->load(['user', 'breakRecords']);
-
-        $correctRequest = $attendance->pendingCorrectRequest();
-
-        $displayBreaks = $correctRequest
-            ? $correctRequest->breakCorrectRequests
-            : $attendance->breakRecords;
-
-        $breakCount = $displayBreaks->count();
-
-        return view('admin.attendance_detail', compact(
-            'attendance',
-            'breakCount',
-            'correctRequest',
-            'displayBreaks'
-        ));
+        return view('admin.attendance_detail', $this->attendanceService->getDetailData($attendance));
     }
 }
