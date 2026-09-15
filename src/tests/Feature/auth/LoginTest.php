@@ -84,4 +84,83 @@ class LoginTest extends TestCase
 
         $this->assertGuest();
     }
+
+    /**
+     * ログイン成功時、勤怠打刻画面にリダイレクトされることを確認
+     */
+    public function test_user_can_login_and_is_redirected_to_attendance(): void
+    {
+        $user = User::factory()->create([
+            'password' => bcrypt('password'),
+        ]);
+
+        $response = $this->post('/login', [
+            'login_type' => 'user',
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect(route('attendance'));
+        $this->assertAuthenticatedAs($user);
+    }
+
+    /**
+     * 管理者アカウントで一般ログイン画面からログインするとエラーになることを確認
+     */
+    public function test_admin_account_cannot_login_from_user_login_screen(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'password' => bcrypt('password'),
+        ]);
+
+        $response = $this->from('/login')
+            ->post('/login', [
+                'login_type' => 'user',
+                'email' => $admin->email,
+                'password' => 'password',
+            ]);
+
+        $response->assertSessionHasErrors([
+            'role' => 'この画面からはログインできません'
+        ]);
+
+        $this->assertGuest();
+    }
+
+    /**
+     * パスワード誤り入力のエラー確認
+     */
+    public function test_password_input_is_invalid(): void
+    {
+        $user = User::factory()->create([
+            'password' => bcrypt('password'),
+        ]);
+
+        $response = $this->from('/login')
+            ->post('/login', [
+                'login_type' => 'user',
+                'email' => $user->email,
+                'password' => 'wrong-password',
+            ]);
+
+        $response->assertSessionHasErrors([
+            'email' => 'ログイン情報が登録されていません'
+        ]);
+
+        $this->assertGuest();
+    }
+
+    /**
+     * ログアウト時、一般ログイン画面にリダイレクトされることを確認
+     */
+    public function test_user_can_logout_and_is_redirected_to_login(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post('/logout');
+
+        $response->assertRedirect(route('login'));
+        $this->assertGuest();
+    }
 }

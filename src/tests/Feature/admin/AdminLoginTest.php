@@ -84,4 +84,64 @@ class AdminLoginTest extends TestCase
 
         $this->assertGuest();
     }
+
+    /**
+     * ログイン成功時、管理者勤怠一覧画面にリダイレクトされることを確認
+     */
+    public function test_admin_can_login_and_is_redirected_to_admin_attendance_index(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'password' => bcrypt('password'),
+        ]);
+
+        $response = $this->post('/login', [
+            'login_type' => 'admin',
+            'email' => $admin->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect(route('admin.attendance.index'));
+        $this->assertAuthenticatedAs($admin);
+    }
+
+    /**
+     * 一般ユーザーアカウントで管理者ログイン画面からログインするとエラーになることを確認
+     */
+    public function test_user_account_cannot_login_from_admin_login_screen(): void
+    {
+        $user = User::factory()->create([
+            'password' => bcrypt('password'),
+        ]);
+
+        $response = $this->from('/admin/login')
+            ->post('/login', [
+                'login_type' => 'admin',
+                'email' => $user->email,
+                'password' => 'password',
+            ]);
+
+        $response->assertSessionHasErrors([
+            'role' => 'この画面からはログインできません'
+        ]);
+
+        $this->assertGuest();
+    }
+
+    /**
+     * ログアウト時(login_type=admin)、管理者ログイン画面にリダイレクトされることを確認
+     */
+    public function test_admin_can_logout_and_is_redirected_to_admin_login(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
+        $response = $this->actingAs($admin)->post('/logout', [
+            'login_type' => 'admin',
+        ]);
+
+        $response->assertRedirect(route('admin.login'));
+        $this->assertGuest();
+    }
 }

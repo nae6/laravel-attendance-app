@@ -201,4 +201,34 @@ class AttendanceCorrectRequestApprovalTest extends TestCase
             'break_end' => '2026-06-03 14:00:00',
         ]);
     }
+
+    /**
+     * 承認済みの申請を再承認しようとするとエラーになる
+     */
+    public function test_admin_cannot_reapprove_already_approved_request(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
+        $user = User::factory()->create();
+
+        $attendance = Attendance::factory()->create([
+            'user_id' => $user->id,
+        ]);
+
+        $correctRequest = AttendanceCorrectRequest::factory()->create([
+            'attendance_id' => $attendance->id,
+            'approval_status' => AttendanceCorrectRequestStatus::Approved,
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->from(route('admin.request.show', $correctRequest))
+            ->put(route('admin.request.approve', $correctRequest));
+
+        $response->assertRedirect(route('admin.request.show', $correctRequest));
+        $response->assertSessionHasErrors([
+            'system_error' => 'この申請はすでに承認済みです',
+        ]);
+    }
 }
