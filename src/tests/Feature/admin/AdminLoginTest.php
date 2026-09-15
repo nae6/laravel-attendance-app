@@ -104,4 +104,27 @@ class AdminLoginTest extends TestCase
         $response->assertRedirect(route('admin.attendance.index'));
         $this->assertAuthenticatedAs($admin);
     }
+
+    /**
+     * 一般ユーザーアカウントで管理者ログイン画面からログインするとエラーになることを確認
+     */
+    public function test_user_account_cannot_login_from_admin_login_screen(): void
+    {
+        $user = User::factory()->create([
+            'password' => bcrypt('password'),
+        ]);
+
+        $response = $this->from('/admin/login')
+            ->post('/login', [
+                'login_type' => 'admin',
+                'email' => $user->email,
+                'password' => 'password',
+            ]);
+
+        $response->assertSessionHasErrors([
+            'role' => 'この画面からはログインできません'
+        ]);
+
+        $this->assertGuest();
+    }
 }
