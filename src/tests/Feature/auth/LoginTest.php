@@ -150,4 +150,17 @@ class LoginTest extends TestCase
 
         $this->assertGuest();
     }
+
+    /**
+     * ログアウト時、一般ログイン画面にリダイレクトされることを確認
+     */
+    public function test_user_can_logout_and_is_redirected_to_login(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post('/logout');
+
+        $response->assertRedirect(route('login'));
+        $this->assertGuest();
+    }
 }
