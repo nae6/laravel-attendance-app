@@ -183,4 +183,23 @@ class StaffAttendanceListTest extends TestCase
         $response->assertSee($attendance->check_in->format('Y年'));
         $response->assertSee($attendance->check_in->format('n月j日'));
     }
+
+    /**
+     * 管理者ロールのユーザーIDを指定すると404になる
+     */
+    public function test_admin_role_staff_returns_404(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
+        $otherAdmin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->get(route('staff.attendance.list', ['staff' => $otherAdmin->id]));
+
+        $response->assertNotFound();
+    }
 }
