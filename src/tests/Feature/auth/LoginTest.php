@@ -84,4 +84,23 @@ class LoginTest extends TestCase
 
         $this->assertGuest();
     }
+
+    /**
+     * ログイン成功時、勤怠打刻画面にリダイレクトされることを確認
+     */
+    public function test_user_can_login_and_is_redirected_to_attendance(): void
+    {
+        $user = User::factory()->create([
+            'password' => bcrypt('password'),
+        ]);
+
+        $response = $this->post('/login', [
+            'login_type' => 'user',
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect(route('attendance'));
+        $this->assertAuthenticatedAs($user);
+    }
 }
