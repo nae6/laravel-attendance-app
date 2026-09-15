@@ -405,4 +405,140 @@ class AttendanceActionTest extends TestCase
         $response->assertSee('05/01');
         $response->assertSee('17:00');
     }
+
+    /**
+     * 出勤済みの状態で再度出勤しようとするとエラーになる
+     */
+    public function test_user_cannot_start_work_twice_in_a_day(): void
+    {
+        $user = User::factory()->create();
+        Attendance::factory()->create([
+            'user_id' => $user->id,
+            'check_in' => now(),
+            'check_out' => null,
+            'status' => '出勤中',
+        ]);
+
+        $response = $this->actingAs($user)->post(route('attendance.start'));
+
+        $response->assertRedirect(route('attendance'));
+        $response->assertSessionHas('message', '本日の出勤は打刻済みです');
+
+        $this->assertDatabaseCount('attendances', 1);
+    }
+
+    /**
+     * 出勤記録がない状態で休憩入りを打刻するとエラーになる
+     */
+    public function test_user_cannot_start_break_without_attendance(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('break.start'));
+
+        $response->assertRedirect(route('attendance'));
+        $response->assertSessionHas('message', '本日の出勤記録がありません');
+    }
+
+    /**
+     * 退勤済みの状態で休憩入りを打刻するとエラーになる
+     */
+    public function test_user_cannot_start_break_after_check_out(): void
+    {
+        $user = User::factory()->create();
+        Attendance::factory()->create([
+            'user_id' => $user->id,
+            'check_in' => now()->subHours(8),
+            'check_out' => now(),
+            'status' => '退勤済',
+        ]);
+
+        $response = $this->actingAs($user)->post(route('break.start'));
+
+        $response->assertRedirect(route('attendance'));
+        $response->assertSessionHas('message', '本日は退勤済みです');
+    }
+
+    /**
+     * 出勤記録がない状態で休憩戻りを打刻するとエラーになる
+     */
+    public function test_user_cannot_end_break_without_attendance(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('break.end'));
+
+        $response->assertRedirect(route('attendance'));
+        $response->assertSessionHas('message', '本日の出勤記録がありません');
+    }
+
+    /**
+     * 退勤済みの状態で休憩戻りを打刻するとエラーになる
+     */
+    public function test_user_cannot_end_break_after_check_out(): void
+    {
+        $user = User::factory()->create();
+        Attendance::factory()->create([
+            'user_id' => $user->id,
+            'check_in' => now()->subHours(8),
+            'check_out' => now(),
+            'status' => '退勤済',
+        ]);
+
+        $response = $this->actingAs($user)->post(route('break.end'));
+
+        $response->assertRedirect(route('attendance'));
+        $response->assertSessionHas('message', '本日は退勤済みです');
+    }
+
+    /**
+     * 終了できる休憩がない状態で休憩戻りを打刻するとエラーになる
+     */
+    public function test_user_cannot_end_break_when_no_active_break(): void
+    {
+        $user = User::factory()->create();
+        Attendance::factory()->create([
+            'user_id' => $user->id,
+            'check_in' => now(),
+            'check_out' => null,
+            'status' => '出勤中',
+        ]);
+
+        $response = $this->actingAs($user)->post(route('break.end'));
+
+        $response->assertRedirect(route('attendance'));
+        $response->assertSessionHas('message', '終了できる休憩がありません');
+    }
+
+    /**
+     * 出勤記録がない状態で退勤しようとするとエラーになる
+     */
+    public function test_user_cannot_end_work_without_attendance(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('attendance.end'));
+
+        $response->assertRedirect(route('attendance'));
+        $response->assertSessionHas('message', '本日の出勤記録がありません');
+    }
+
+    /**
+     * 退勤済みの状態で再度退勤しようとするとエラーになる
+     */
+    public function test_user_cannot_end_work_twice_in_a_day(): void
+    {
+        $user = User::factory()->create();
+        Attendance::factory()->create([
+            'user_id' => $user->id,
+            'check_in' => now()->subHours(8),
+            'check_out' => now(),
+            'status' => '退勤済',
+        ]);
+
+        $response = $this->actingAs($user)->post(route('attendance.end'));
+
+        $response->assertRedirect(route('attendance'));
+        $response->assertSessionHas('message', '本日の退勤は打刻済みです');
+    }
 }
