@@ -312,4 +312,37 @@ class AttendanceCorrectRequestTest extends TestCase
             ->get(route('attendance.edit', $attendance->id));
         $detailResponse->assertOk();
     }
+
+    /**
+     * 休憩欄が空の場合は休憩の修正申請が作成されない
+     */
+    public function test_correct_request_skips_empty_break_row(): void
+    {
+        $user = User::factory()->create();
+
+        $attendance = Attendance::factory()->create([
+            'user_id' => $user->id,
+            'check_in' => '2026-06-10 08:00:00',
+            'check_out' => '2026-06-10 17:00:00',
+        ]);
+
+        $response = $this->actingAs($user)
+            ->from(route('attendance.edit', $attendance->id))
+            ->put(route('attendance.update', $attendance->id), [
+                'date' => '2026-06-10',
+                'check_in' => '09:00',
+                'check_out' => '15:00',
+                'breaks' => [
+                    [
+                        'break_start' => null,
+                        'break_end' => null,
+                    ],
+                ],
+                'reason' => 'あいうえお',
+            ]);
+
+        $response->assertRedirect(route('attendance.edit', $attendance->id));
+
+        $this->assertDatabaseCount('break_correct_requests', 0);
+    }
 }
