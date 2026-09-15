@@ -26,12 +26,14 @@ body {
     text-decoration: none;
     display: inline-flex;
     align-items: center;
+    min-width: 0;
 }
 
 .header__logo img {
     display: block;
-    height: 36px;
+    max-height: 36px;
     width: auto;
+    max-width: 100%;
 }
 
 /* header nav */
