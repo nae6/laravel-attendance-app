@@ -231,4 +231,42 @@ class AdminAttendanceShowTest extends TestCase
             'approval_status' => AttendanceCorrectRequestStatus::Approved->value,
         ]);
     }
+
+    /**
+     * 休憩欄が空の場合は休憩情報が保存されない
+     */
+    public function test_admin_update_skips_empty_break_row(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
+        $user = User::factory()->create();
+
+        $attendance = Attendance::factory()->create([
+            'user_id' => $user->id,
+            'check_in' => '2026-05-02 10:00:00',
+            'check_out' => '2026-05-02 17:00:00',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->from(route('admin.attendance.edit', $attendance->id))
+            ->put(route('admin.attendance.update', $attendance->id), [
+                'date' => '2026-05-02',
+                'check_in' => '09:00',
+                'check_out' => '18:00',
+                'breaks' => [
+                    [
+                        'break_start' => null,
+                        'break_end' => null,
+                    ],
+                ],
+                'reason' => '修正テスト',
+            ]);
+
+        $response->assertRedirect(route('admin.attendance.index', $attendance));
+
+        $this->assertDatabaseCount('break_records', 0);
+        $this->assertDatabaseCount('break_correct_requests', 0);
+    }
 }
