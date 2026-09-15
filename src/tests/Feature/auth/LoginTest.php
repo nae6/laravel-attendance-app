@@ -127,4 +127,27 @@ class LoginTest extends TestCase
 
         $this->assertGuest();
     }
+
+    /**
+     * パスワード誤り入力のエラー確認
+     */
+    public function test_password_input_is_invalid(): void
+    {
+        $user = User::factory()->create([
+            'password' => bcrypt('password'),
+        ]);
+
+        $response = $this->from('/login')
+            ->post('/login', [
+                'login_type' => 'user',
+                'email' => $user->email,
+                'password' => 'wrong-password',
+            ]);
+
+        $response->assertSessionHasErrors([
+            'email' => 'ログイン情報が登録されていません'
+        ]);
+
+        $this->assertGuest();
+    }
 }
