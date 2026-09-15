@@ -127,4 +127,21 @@ class AdminLoginTest extends TestCase
 
         $this->assertGuest();
     }
+
+    /**
+     * ログアウト時(login_type=admin)、管理者ログイン画面にリダイレクトされることを確認
+     */
+    public function test_admin_can_logout_and_is_redirected_to_admin_login(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
+        $response = $this->actingAs($admin)->post('/logout', [
+            'login_type' => 'admin',
+        ]);
+
+        $response->assertRedirect(route('admin.login'));
+        $this->assertGuest();
+    }
 }
