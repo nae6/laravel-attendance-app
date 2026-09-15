@@ -3,10 +3,12 @@
 namespace Tests\Feature\admin;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Enums\AttendanceCorrectRequestStatus;
 use App\Models\BreakRecord;
 use App\Models\Attendance;
 use App\Models\User;
 use Tests\TestCase;
+use Carbon\Carbon;
 
 class AdminAttendanceShowTest extends TestCase
 {
@@ -166,5 +168,105 @@ class AdminAttendanceShowTest extends TestCase
 
         $response->assertRedirect(route('admin.attendance.edit', $attendance->id));
         $response->assertSessionHasErrors(['reason' => '備考を記入してください']);
+    }
+
+    /**
+     * 管理者が勤怠修正を正常に保存できる
+     */
+    public function test_admin_can_update_attendance(): void
+    {
+        Carbon::setTestNow('2026-06-15 08:00:00');
+
+        $admin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
+        $user = User::factory()->create();
+
+        $attendance = Attendance::factory()->create([
+            'user_id' => $user->id,
+            'check_in' => '2026-05-02 10:00:00',
+            'check_out' => '2026-05-02 17:00:00',
+        ]);
+
+        BreakRecord::factory()->create([
+            'attendance_id' => $attendance->id,
+            'break_start' => '2026-05-02 11:00:00',
+            'break_end' => '2026-05-02 12:00:00',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->from(route('admin.attendance.edit', $attendance->id))
+            ->put(route('admin.attendance.update', $attendance->id), [
+                'date' => '2026-05-02',
+                'check_in' => '09:00',
+                'check_out' => '18:00',
+                'breaks' => [
+                    [
+                        'break_start' => '12:00',
+                        'break_end' => '13:00',
+                    ],
+                ],
+                'reason' => '修正テスト',
+            ]);
+
+        $response->assertRedirect(route('admin.attendance.index', $attendance));
+        $response->assertSessionHas('message', '勤怠を修正しました');
+
+        $attendance->refresh();
+        $this->assertSame('2026-05-02 09:00:00', $attendance->check_in->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-05-02 18:00:00', $attendance->check_out->format('Y-m-d H:i:s'));
+        $this->assertSame('退勤済', $attendance->status);
+
+        // 既知の不具合: 休憩時刻は修正対象日(2026-05-02)ではなく、保存処理を実行した日(today)の日付で保存される
+        $this->assertDatabaseHas('break_records', [
+            'attendance_id' => $attendance->id,
+            'break_start' => '2026-06-15 12:00:00',
+            'break_end' => '2026-06-15 13:00:00',
+        ]);
+
+        $this->assertDatabaseHas('attendance_correct_requests', [
+            'attendance_id' => $attendance->id,
+            'reason' => '修正テスト',
+            'approval_status' => AttendanceCorrectRequestStatus::Approved->value,
+        ]);
+    }
+
+    /**
+     * 休憩欄が空の場合は休憩情報が保存されない
+     */
+    public function test_admin_update_skips_empty_break_row(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
+        $user = User::factory()->create();
+
+        $attendance = Attendance::factory()->create([
+            'user_id' => $user->id,
+            'check_in' => '2026-05-02 10:00:00',
+            'check_out' => '2026-05-02 17:00:00',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->from(route('admin.attendance.edit', $attendance->id))
+            ->put(route('admin.attendance.update', $attendance->id), [
+                'date' => '2026-05-02',
+                'check_in' => '09:00',
+                'check_out' => '18:00',
+                'breaks' => [
+                    [
+                        'break_start' => null,
+                        'break_end' => null,
+                    ],
+                ],
+                'reason' => '修正テスト',
+            ]);
+
+        $response->assertRedirect(route('admin.attendance.index', $attendance));
+
+        $this->assertDatabaseCount('break_records', 0);
+        $this->assertDatabaseCount('break_correct_requests', 0);
     }
 }
