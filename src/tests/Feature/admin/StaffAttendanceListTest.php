@@ -202,4 +202,23 @@ class StaffAttendanceListTest extends TestCase
 
         $response->assertNotFound();
     }
+
+    /**
+     * 管理者ロールのユーザーIDをCSVエクスポートに指定すると404になる
+     */
+    public function test_admin_role_staff_export_returns_404(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
+        $otherAdmin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->get(route('staff.attendance.export', ['staff' => $otherAdmin->id]));
+
+        $response->assertNotFound();
+    }
 }
