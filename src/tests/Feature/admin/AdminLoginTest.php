@@ -84,4 +84,24 @@ class AdminLoginTest extends TestCase
 
         $this->assertGuest();
     }
+
+    /**
+     * ログイン成功時、管理者勤怠一覧画面にリダイレクトされることを確認
+     */
+    public function test_admin_can_login_and_is_redirected_to_admin_attendance_index(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'password' => bcrypt('password'),
+        ]);
+
+        $response = $this->post('/login', [
+            'login_type' => 'admin',
+            'email' => $admin->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect(route('admin.attendance.index'));
+        $this->assertAuthenticatedAs($admin);
+    }
 }
