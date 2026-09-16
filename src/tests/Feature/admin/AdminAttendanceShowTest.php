@@ -226,6 +226,11 @@ class AdminAttendanceShowTest extends TestCase
             'reason' => '修正テスト',
             'approval_status' => AttendanceCorrectRequestStatus::Approved->value,
         ]);
+
+        $this->assertDatabaseHas('break_correct_requests', [
+            'requested_break_start' => '2026-05-02 12:00:00',
+            'requested_break_end' => '2026-05-02 13:00:00',
+        ]);
     }
 
     /**
