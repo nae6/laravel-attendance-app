@@ -76,8 +76,8 @@ class AdminAttendanceCorrectController extends Controller
 
             BreakCorrectRequest::create([
                 'attendance_correct_request_id' => $correctRequest->id,
-                'requested_break_start' => $break['break_start'],
-                'requested_break_end' => $break['break_end'],
+                'requested_break_start' => $this->toDateTime($validated['date'], $break['break_start']),
+                'requested_break_end' => $this->toDateTime($validated['date'], $break['break_end']),
             ]);
         }
     }
