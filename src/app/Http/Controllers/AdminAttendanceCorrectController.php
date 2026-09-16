@@ -105,8 +105,8 @@ class AdminAttendanceCorrectController extends Controller
             }
 
             $attendance->breakRecords()->create([
-                'break_start' => $break['break_start'],
-                'break_end' => $break['break_end'],
+                'break_start' => $this->toDateTime($validated['date'], $break['break_start']),
+                'break_end' => $this->toDateTime($validated['date'], $break['break_end']),
             ]);
         }
     }

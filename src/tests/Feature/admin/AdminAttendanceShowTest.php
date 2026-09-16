@@ -8,7 +8,6 @@ use App\Models\BreakRecord;
 use App\Models\Attendance;
 use App\Models\User;
 use Tests\TestCase;
-use Carbon\Carbon;
 
 class AdminAttendanceShowTest extends TestCase
 {
@@ -175,8 +174,6 @@ class AdminAttendanceShowTest extends TestCase
      */
     public function test_admin_can_update_attendance(): void
     {
-        Carbon::setTestNow('2026-06-15 08:00:00');
-
         $admin = User::factory()->create([
             'role' => 'admin',
         ]);
@@ -218,11 +215,10 @@ class AdminAttendanceShowTest extends TestCase
         $this->assertSame('2026-05-02 18:00:00', $attendance->check_out->format('Y-m-d H:i:s'));
         $this->assertSame('退勤済', $attendance->status);
 
-        // 既知の不具合: 休憩時刻は修正対象日(2026-05-02)ではなく、保存処理を実行した日(today)の日付で保存される
         $this->assertDatabaseHas('break_records', [
             'attendance_id' => $attendance->id,
-            'break_start' => '2026-06-15 12:00:00',
-            'break_end' => '2026-06-15 13:00:00',
+            'break_start' => '2026-05-02 12:00:00',
+            'break_end' => '2026-05-02 13:00:00',
         ]);
 
         $this->assertDatabaseHas('attendance_correct_requests', [
