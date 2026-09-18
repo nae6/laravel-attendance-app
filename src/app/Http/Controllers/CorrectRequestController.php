@@ -3,20 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AttendanceCorrectRequestFormRequest;
+use App\Services\AttendanceCorrectRequestService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use App\Enums\AttendanceCorrectRequestStatus;
-use App\Models\AttendanceCorrectRequest;
-use App\Models\BreakCorrectRequest;
 use App\Models\Attendance;
-use Carbon\Carbon;
 
 class CorrectRequestController extends Controller
 {
+    public function __construct(
+        private AttendanceCorrectRequestService $attendanceCorrectRequestService
+    ) {
+    }
+
     /**
      * 勤怠の修正申請(user)
      *
@@ -25,31 +26,8 @@ class CorrectRequestController extends Controller
     public function update(AttendanceCorrectRequestFormRequest $request, Attendance $attendance): RedirectResponse {
         abort_if($attendance->user_id !== Auth::id(), 403);
 
-        $validated = $request->validated();
-
         try {
-            DB::transaction(function () use ($attendance, $validated) {
-                $attendanceDate = $attendance->check_in->toDateString();
-
-                $correctRequest = AttendanceCorrectRequest::create([
-                    'attendance_id' => $attendance->id,
-                    'requested_check_in' => Carbon::parse($attendanceDate . ' ' . $validated['check_in']),
-                    'requested_check_out' => Carbon::parse($attendanceDate . ' ' . $validated['check_out']),
-                    'reason' => $validated['reason'],
-                ]);
-
-                foreach ($validated['breaks'] ?? [] as $break) {
-                    if (empty($break['break_start']) && empty($break['break_end'])) {
-                        continue;
-                    }
-
-                    BreakCorrectRequest::create([
-                        'attendance_correct_request_id' => $correctRequest->id,
-                        'requested_break_start' => Carbon::parse($attendanceDate . ' ' . $break['break_start']),
-                        'requested_break_end' => Carbon::parse($attendanceDate . ' ' . $break['break_end']),
-                    ]);
-                };
-            });
+            $this->attendanceCorrectRequestService->createUserRequest($attendance, $request->validated());
 
             return redirect()->route('attendance.edit', $attendance);
         } catch (\Throwable $e) {
@@ -72,21 +50,8 @@ class CorrectRequestController extends Controller
     public function index(Request $request): View {
         $viewType = $request->attributes->get('view_type');
 
-        $baseQuery = AttendanceCorrectRequest::with('attendance.user')
-            ->latest('created_at');
+        $data = $this->attendanceCorrectRequestService->getRequestListData($viewType, Auth::id());
 
-        if ($viewType === 'user') {
-            $baseQuery->forUser(Auth::id());
-        }
-
-        $pendingRequests = (clone $baseQuery)
-            ->where('approval_status', AttendanceCorrectRequestStatus::Pending)
-            ->get();
-
-        $approvedRequests = (clone $baseQuery)
-            ->where('approval_status', AttendanceCorrectRequestStatus::Approved)
-            ->get();
-
-        return view('common.request_history', compact('pendingRequests', 'approvedRequests', 'viewType'));
+        return view('common.request_history', array_merge($data, compact('viewType')));
     }
 }
