@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 
 class AdminMiddleware
@@ -14,9 +15,7 @@ class AdminMiddleware
      * @return Response
      */
     public function handle(Request $request, Closure $next): Response {
-        if (!$request->user() || $request->user()->role !== 'admin') {
-            abort(403);
-        }
+        Gate::authorize('access-admin');
 
         return $next($request);
     }
