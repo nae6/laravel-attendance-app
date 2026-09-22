@@ -32,7 +32,7 @@ class AdminStaffController extends Controller
      * @return View
      */
     public function index(Request $request, User $staff): View {
-        abort_if($staff->role !== 'user', 404);
+        $this->authorize('viewAttendance', $staff);
 
         $monthData = $this->adminStaffService->getMonthlyAttendanceData(
             $staff,
@@ -55,7 +55,7 @@ class AdminStaffController extends Controller
      * @return StreamedResponse
      */
     public function export(Request $request, User $staff): StreamedResponse {
-        abort_if($staff->role !== 'user', 404);
+        $this->authorize('viewAttendance', $staff);
 
         $monthData = $this->adminStaffService->getMonthlyAttendanceData(
             $staff,
