@@ -36,7 +36,7 @@ class AttendanceController extends Controller
      * @return View
      */
     public function edit(Attendance $attendance): View {
-        abort_if($attendance->user_id !== Auth::id(), 403);
+        $this->authorize('view', $attendance);
 
         return view('user.detail', $this->attendanceService->getDetailData($attendance));
     }

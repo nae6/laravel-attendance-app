@@ -24,7 +24,7 @@ class CorrectRequestController extends Controller
      * @return RedirectResponse
      */
     public function update(AttendanceCorrectRequestFormRequest $request, Attendance $attendance): RedirectResponse {
-        abort_if($attendance->user_id !== Auth::id(), 403);
+        $this->authorize('view', $attendance);
 
         try {
             $this->attendanceCorrectRequestService->createUserRequest($attendance, $request->validated());
