@@ -48,7 +48,7 @@ class CorrectRequestController extends Controller
      * @return View
      */
     public function index(Request $request): View {
-        $viewType = $request->attributes->get('view_type');
+        $viewType = $request->user()->isAdmin() ? 'admin' : 'user';
 
         $data = $this->attendanceCorrectRequestService->getRequestListData($viewType, Auth::id());
 

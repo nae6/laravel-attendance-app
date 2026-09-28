@@ -66,7 +66,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 /**
  * ログイン済ユーザー共通
  */
-Route::middleware(['auth', 'verified', 'switch.display'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/stamp_correction_request/list', [CorrectRequestController::class, 'index'])
         ->name('request.list');
 });
