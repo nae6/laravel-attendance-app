@@ -92,7 +92,6 @@
 <form action="{{ route('attendance.update', $attendance->id) }}" method="POST">
     @method('PUT')
     @csrf
-    <input type="hidden" name="date" value="{{ $attendance->check_in->format('Y-m-d') }}">
     <table class="table__wrapper font-setting">
         <tr class="table__row">
             <th>名前</th>

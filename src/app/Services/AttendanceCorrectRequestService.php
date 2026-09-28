@@ -93,18 +93,21 @@ class AttendanceCorrectRequestService
      */
     public function updateByAdmin(Attendance $attendance, array $validated): void
     {
-        DB::transaction(function () use ($attendance, $validated) {
-            $correctRequest = $this->storeAdminCorrectRequest($attendance, $validated);
+        // 改ざん可能なリクエスト値ではなく、対象勤怠の日付を使う
+        $date = $attendance->check_in->toDateString();
 
-            $this->storeAdminBreakCorrectRequests($correctRequest, $validated);
+        DB::transaction(function () use ($attendance, $validated, $date) {
+            $correctRequest = $this->storeAdminCorrectRequest($attendance, $validated, $date);
+
+            $this->storeAdminBreakCorrectRequests($correctRequest, $validated, $date);
 
             $attendance->update([
-                'check_in' => $this->toDateTime($validated['date'], $validated['check_in']),
-                'check_out' => $this->toDateTime($validated['date'], $validated['check_out']),
+                'check_in' => $this->toDateTime($date, $validated['check_in']),
+                'check_out' => $this->toDateTime($date, $validated['check_out']),
                 'status' => AttendanceStatus::Finished,
             ]);
 
-            $this->replaceBreakRecords($attendance, $validated);
+            $this->replaceBreakRecords($attendance, $validated, $date);
         });
     }
 
@@ -113,12 +116,12 @@ class AttendanceCorrectRequestService
      *
      * @return AttendanceCorrectRequest
      */
-    private function storeAdminCorrectRequest(Attendance $attendance, array $validated): AttendanceCorrectRequest
+    private function storeAdminCorrectRequest(Attendance $attendance, array $validated, string $date): AttendanceCorrectRequest
     {
         return AttendanceCorrectRequest::create([
             'attendance_id' => $attendance->id,
-            'requested_check_in' => $this->toDateTime($validated['date'], $validated['check_in']),
-            'requested_check_out' => $this->toDateTime($validated['date'], $validated['check_out']),
+            'requested_check_in' => $this->toDateTime($date, $validated['check_in']),
+            'requested_check_out' => $this->toDateTime($date, $validated['check_out']),
             'reason' => $validated['reason'],
             'approval_status' => AttendanceCorrectRequestStatus::Approved,
         ]);
@@ -127,7 +130,7 @@ class AttendanceCorrectRequestService
     /**
      * 修正後の休憩履歴を保存
      */
-    private function storeAdminBreakCorrectRequests(AttendanceCorrectRequest $correctRequest, array $validated): void
+    private function storeAdminBreakCorrectRequests(AttendanceCorrectRequest $correctRequest, array $validated, string $date): void
     {
         foreach ($validated['breaks'] ?? [] as $break) {
             if ($this->isEmptyBreak($break)) {
@@ -136,8 +139,8 @@ class AttendanceCorrectRequestService
 
             BreakCorrectRequest::create([
                 'attendance_correct_request_id' => $correctRequest->id,
-                'requested_break_start' => $this->toDateTime($validated['date'], $break['break_start']),
-                'requested_break_end' => $this->toDateTime($validated['date'], $break['break_end']),
+                'requested_break_start' => $this->toDateTime($date, $break['break_start']),
+                'requested_break_end' => $this->toDateTime($date, $break['break_end']),
             ]);
         }
     }
@@ -145,7 +148,7 @@ class AttendanceCorrectRequestService
     /**
      * 休憩を修正後の内容に置き換える
      */
-    private function replaceBreakRecords(Attendance $attendance, array $validated): void
+    private function replaceBreakRecords(Attendance $attendance, array $validated, string $date): void
     {
         $attendance->breakRecords()->delete();
 
@@ -155,8 +158,8 @@ class AttendanceCorrectRequestService
             }
 
             $attendance->breakRecords()->create([
-                'break_start' => $this->toDateTime($validated['date'], $break['break_start']),
-                'break_end' => $this->toDateTime($validated['date'], $break['break_end']),
+                'break_start' => $this->toDateTime($date, $break['break_start']),
+                'break_end' => $this->toDateTime($date, $break['break_end']),
             ]);
         }
     }
