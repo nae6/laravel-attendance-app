@@ -11,11 +11,12 @@ use Illuminate\Http\Request;
 use Laravel\Fortify\Http\Requests\LoginRequest as FortifyLoginRequest;
 use Laravel\Fortify\Contracts\LogoutResponse as LogoutResponseContract;
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
-use Laravel\Fortify\Contracts\RegisterResponse;
+use Laravel\Fortify\Contracts\RegisterResponse as RegisterResponseContract;
 use Laravel\Fortify\Fortify;
 use App\Actions\Fortify\CreateNewUser;
 use App\Enums\UserRole;
 use App\Http\Responses\LogoutResponse;
+use App\Http\Responses\RegisterResponse;
 use App\Http\Responses\LoginResponse;
 use App\Http\Requests\LoginRequest;
 use App\Models\User;
@@ -28,13 +29,7 @@ class FortifyServiceProvider extends ServiceProvider
     public function register(): void {
         $this->app->singleton(FortifyLoginRequest::class, LoginRequest::class);
 
-        $this->app->instance(RegisterResponse::class, new class implements RegisterResponse {
-            public function toResponse($request)
-            {
-                return redirect()->route('verification.notice');
-            }
-        });
-
+        $this->app->singleton(RegisterResponseContract::class, RegisterResponse::class);
         $this->app->singleton(LoginResponseContract::class, LoginResponse::class);
         $this->app->singleton(LogoutResponseContract::class, LogoutResponse::class);
     }
