@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AttendanceCorrectRequestStatus;
+use App\Enums\AttendanceStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -29,6 +30,7 @@ class Attendance extends Model
     protected $casts = [
         'check_in' => 'datetime',
         'check_out' => 'datetime',
+        'status' => AttendanceStatus::class,
     ];
 
     /**

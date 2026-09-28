@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\BreakRecord;
 use App\Models\Attendance;
+use App\Enums\AttendanceStatus;
 use App\Enums\UserRole;
 use App\Models\User;
 use Carbon\CarbonPeriod;
@@ -34,7 +35,7 @@ class AttendancesTableSeeder extends Seeder
                     'user_id' => $user->id,
                     'check_in' => $date->copy()->setTime(rand(8, 10), rand(0, 59)),
                     'check_out' => $date->copy()->setTime(rand(17, 21), rand(0, 59)),
-                    'status' => '退勤済',
+                    'status' => AttendanceStatus::Finished,
                 ]);
 
                 // 紐づく休憩データを作成

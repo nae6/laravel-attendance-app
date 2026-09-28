@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\AttendanceStatus;
 use App\Models\Attendance;
 use App\Models\BreakRecord;
 use Carbon\Carbon;
@@ -14,18 +15,18 @@ class AttendanceActionService
      * 勤怠打刻画面の表示に必要な情報を取得
      *
      * @param int $userId
-     * @return array{status: string, now_date: string, now_time: string}
+     * @return array{status: AttendanceStatus, now_date: string, now_time: string}
      */
     public function getAttendanceActionData(int $userId): array
     {
         $attendance = $this->getTodayAttendance($userId);
 
-        $status = $attendance ? $attendance->status : '勤務外';
+        $status = $attendance ? $attendance->status : AttendanceStatus::OffDuty;
 
         $now = Carbon::now();
         $now_date = $now->isoFormat('YYYY年MM月DD日(ddd)');
 
-        if ($attendance && $attendance->status === '退勤済') {
+        if ($attendance && $attendance->status === AttendanceStatus::Finished) {
             $now_time = $attendance->check_out->format('H:i');
         } else {
             $now_time = now()->format('H:i');
@@ -86,7 +87,7 @@ class AttendanceActionService
                 ]);
 
                 $attendance->update([
-                    'status' => '休憩中',
+                    'status' => AttendanceStatus::OnBreak,
                 ]);
             });
 
@@ -132,7 +133,7 @@ class AttendanceActionService
                 ]);
 
                 $attendance->update([
-                    'status' => '出勤中',
+                    'status' => AttendanceStatus::Working,
                 ]);
             });
 
@@ -164,7 +165,7 @@ class AttendanceActionService
 
         $attendance->update([
             'check_out' => now(),
-            'status' => '退勤済',
+            'status' => AttendanceStatus::Finished,
         ]);
 
         return ['message' => '退勤しました'];
