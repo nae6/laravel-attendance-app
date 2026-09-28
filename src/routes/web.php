@@ -32,7 +32,7 @@ Route::post('/email/verification-notification', function (Request $request) {
 /**
  * roleごとのログイン画面表示切り替え
  */
-Route::middleware(['web', 'guest'])->group(function () {
+Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'user'])
         ->name('login');
     Route::get('/admin/login', [LoginController::class, 'admin'])
