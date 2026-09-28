@@ -7,11 +7,13 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Models\User;
 use App\Services\AdminStaffService;
+use App\Services\AttendanceService;
 
 class AdminStaffAttendanceController extends Controller
 {
     public function __construct(
-        private AdminStaffService $adminStaffService
+        private AdminStaffService $adminStaffService,
+        private AttendanceService $attendanceService
     ) {
     }
 
@@ -23,8 +25,8 @@ class AdminStaffAttendanceController extends Controller
     public function index(Request $request, User $staff): View {
         $this->authorize('viewAttendance', $staff);
 
-        $monthData = $this->adminStaffService->getMonthlyAttendanceData(
-            $staff,
+        $monthData = $this->attendanceService->getMonthlyAttendanceData(
+            $staff->id,
             $request->input('month')
         );
 
@@ -39,8 +41,8 @@ class AdminStaffAttendanceController extends Controller
     public function export(Request $request, User $staff): StreamedResponse {
         $this->authorize('viewAttendance', $staff);
 
-        $monthData = $this->adminStaffService->getMonthlyAttendanceData(
-            $staff,
+        $monthData = $this->attendanceService->getMonthlyAttendanceData(
+            $staff->id,
             $request->input('month')
         );
         $csv = $this->adminStaffService->buildCsv($monthData);
