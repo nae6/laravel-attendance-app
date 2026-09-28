@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
@@ -12,7 +13,7 @@ class UserPolicy
      */
     public function viewAttendance(User $admin, User $staff): Response
     {
-        return $staff->role === 'user'
+        return $staff->role === UserRole::User
             ? Response::allow()
             : Response::denyAsNotFound();
     }

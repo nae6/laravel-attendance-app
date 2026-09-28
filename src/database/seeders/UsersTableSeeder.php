@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Seeder;
+use App\Enums\UserRole;
 use App\Models\User;
 
 class UsersTableSeeder extends Seeder
@@ -19,7 +20,7 @@ class UsersTableSeeder extends Seeder
             'email' => 'admin@example.com',
             'email_verified_at' => now(),
             'password' => Hash::make('admin1234'),
-            'role' => 'admin',
+            'role' => UserRole::Admin,
         ]);
 
         // 一般ユーザー

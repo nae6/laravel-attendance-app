@@ -1,9 +1,10 @@
 <?php
 
-namespace Tests\Feature\admin;
+namespace Tests\Feature\Admin;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Enums\AttendanceCorrectRequestStatus;
+use App\Enums\AttendanceStatus;
 use App\Models\BreakRecord;
 use App\Models\Attendance;
 use App\Models\User;
@@ -213,7 +214,7 @@ class AdminAttendanceShowTest extends TestCase
         $attendance->refresh();
         $this->assertSame('2026-05-02 09:00:00', $attendance->check_in->format('Y-m-d H:i:s'));
         $this->assertSame('2026-05-02 18:00:00', $attendance->check_out->format('Y-m-d H:i:s'));
-        $this->assertSame('退勤済', $attendance->status);
+        $this->assertSame(AttendanceStatus::Finished, $attendance->status);
 
         $this->assertDatabaseHas('break_records', [
             'attendance_id' => $attendance->id,

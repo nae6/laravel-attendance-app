@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\AlreadyApprovedException;
 use App\Http\Requests\AttendanceCorrectRequestFormRequest;
 use App\Services\AttendanceCorrectRequestService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use App\Enums\AttendanceCorrectRequestStatus;
 use App\Models\AttendanceCorrectRequest;
 use App\Models\Attendance;
 
@@ -59,18 +59,17 @@ class AdminAttendanceCorrectController extends Controller
      * @return RedirectResponse
      */
     public function approve(AttendanceCorrectRequest $attendanceCorrectRequest): RedirectResponse {
-        if ($attendanceCorrectRequest->approval_status === AttendanceCorrectRequestStatus::Approved) {
-            return back()->withErrors([
-                'system_error' => 'この申請はすでに承認済みです',
-            ]);
-        }
-
         try {
             $this->attendanceCorrectRequestService->approve($attendanceCorrectRequest);
 
             return redirect()->route('request.list')->with('success', '申請を承認しました');
 
-        } catch (\Exception $e) {
+        } catch (AlreadyApprovedException) {
+            return back()->withErrors([
+                'system_error' => 'この申請はすでに承認済みです',
+            ]);
+
+        } catch (\Throwable $e) {
             Log::error('管理者による修正承認に失敗', [
                 'attendance_correct_request_id' => $attendanceCorrectRequest->id,
                 'error' => $e->getMessage(),

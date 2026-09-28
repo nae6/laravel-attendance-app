@@ -2,10 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\Attendance;
+use App\Enums\UserRole;
 use App\Models\User;
-use Carbon\Carbon;
-use Carbon\CarbonPeriod;
 use Illuminate\Support\Collection;
 
 class AdminStaffService
@@ -15,44 +13,32 @@ class AdminStaffService
      */
     public function getStaffList(): Collection
     {
-        return User::where('role', 'user')
+        return User::where('role', UserRole::User)
             ->select('id', 'name', 'email')
             ->get();
     }
 
     /**
-     * スタッフ別月次勤怠一覧に必要な情報を取得する。
-     *
-     * @return array{attendances: Collection, currentMonth: Carbon, dates: CarbonPeriod, lastMonth: string, nextMonth: string, startOfMonth: Carbon, endOfMonth: Carbon}
+     * スタッフ別勤怠CSVの内容を組み立てる。
      */
-    public function getMonthlyAttendanceData(User $staff, ?string $month): array
+    public function buildCsv(array $monthData): string
     {
-        $currentMonth = Carbon::parse($month ?? today()->format('Y-m'));
+        $stream = fopen('php://temp', 'r+');
 
-        $lastMonth = $currentMonth->copy()->subMonth()->format('Y-m');
-        $nextMonth = $currentMonth->copy()->addMonth()->format('Y-m');
-        $startOfMonth = $currentMonth->copy()->startOfMonth();
-        $endOfMonth = $currentMonth->copy()->endOfMonth();
-        $dates = CarbonPeriod::create($startOfMonth, $endOfMonth);
+        // Excelの文字化け対策
+        fwrite($stream, "\xEF\xBB\xBF");
 
-        $attendances = Attendance::with('breakRecords', 'user')
-            ->where('user_id', $staff->id)
-            ->whereBetween('check_in', [
-                $startOfMonth,
-                $endOfMonth->copy()->endOfDay(),
-            ])
-            ->get()
-            ->keyBy(fn (Attendance $attendance) => $attendance->check_in->format('Y-m-d'));
+        fputcsv($stream, ['日付', '出勤', '退勤', '休憩', '合計']);
 
-        return compact(
-            'attendances',
-            'currentMonth',
-            'dates',
-            'lastMonth',
-            'nextMonth',
-            'startOfMonth',
-            'endOfMonth'
-        );
+        foreach ($this->getCsvRows($monthData) as $row) {
+            fputcsv($stream, $row);
+        }
+
+        rewind($stream);
+        $csv = stream_get_contents($stream);
+        fclose($stream);
+
+        return $csv;
     }
 
     /**
@@ -60,7 +46,7 @@ class AdminStaffService
      *
      * @return array<int, array<int, string>>
      */
-    public function getCsvRows(array $monthData): array
+    private function getCsvRows(array $monthData): array
     {
         $rows = [];
 
