@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Models\Attendance;
@@ -22,7 +21,7 @@ class AttendanceController extends Controller
      */
     public function index(Request $request): View {
         $data = $this->attendanceService->getMonthlyAttendanceData(
-            Auth::id(),
+            $request->user()->id,
             $request->input('month')
         );
 
