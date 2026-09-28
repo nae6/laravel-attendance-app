@@ -28,14 +28,7 @@ class AdminStaffAttendanceController extends Controller
             $request->input('month')
         );
 
-        return view('admin.staff_attendance_history', [
-            'staff' => $staff,
-            'attendances' => $monthData['attendances'],
-            'currentMonth' => $monthData['currentMonth'],
-            'dates' => $monthData['dates'],
-            'lastMonth' => $monthData['lastMonth'],
-            'nextMonth' => $monthData['nextMonth'],
-        ]);
+        return view('admin.staff_attendance_history', array_merge($monthData, compact('staff')));
     }
 
     /**
@@ -50,31 +43,13 @@ class AdminStaffAttendanceController extends Controller
             $staff,
             $request->input('month')
         );
-        $rows = $this->adminStaffService->getCsvRows($monthData);
+        $csv = $this->adminStaffService->buildCsv($monthData);
 
         $fileName = $staff->name . '_' . $monthData['currentMonth']->format('Y-m') . '_attendance.csv';
 
         return response()->streamDownload(
-            function () use ($rows) {
-                $stream = fopen('php://output', 'w');
-
-                // Excelの文字化け対策
-                fwrite($stream, "\xEF\xBB\xBF");
-
-                // ヘッダー行
-                fputcsv($stream, [
-                    '日付',
-                    '出勤',
-                    '退勤',
-                    '休憩',
-                    '合計',
-                ]);
-
-                foreach ($rows as $row) {
-                    fputcsv($stream, $row);
-                }
-
-                fclose($stream);
+            function () use ($csv) {
+                echo $csv;
             },
             $fileName,
             [
