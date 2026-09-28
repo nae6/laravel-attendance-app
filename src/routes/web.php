@@ -8,15 +8,14 @@ use App\Http\Controllers\CorrectRequestController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AdminStaffAttendanceController;
 use App\Http\Controllers\AdminStaffController;
-use App\Http\Controllers\LoginController;
 
 /**
  * roleごとのログイン画面表示切り替え
  */
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [LoginController::class, 'user'])
+    Route::view('/login', 'auth.login')
         ->name('login');
-    Route::get('/admin/login', [LoginController::class, 'admin'])
+    Route::view('/admin/login', 'admin.login')
         ->name('admin.login');
 });
 
