@@ -16,10 +16,13 @@ class BreakCorrectRequest extends Model
         'requested_break_end',
     ];
 
-    protected $casts = [
-        'requested_break_start' => 'datetime',
-        'requested_break_end' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'requested_break_start' => 'datetime',
+            'requested_break_end' => 'datetime',
+        ];
+    }
 
     /**
      * 休憩時間の修正申請内容を取得

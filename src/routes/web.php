@@ -8,6 +8,7 @@ use App\Http\Controllers\AttendanceActionController;
 use App\Http\Controllers\AdminAttendanceController;
 use App\Http\Controllers\CorrectRequestController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AdminStaffAttendanceController;
 use App\Http\Controllers\AdminStaffController;
 use App\Http\Controllers\LoginController;
 
@@ -31,7 +32,7 @@ Route::post('/email/verification-notification', function (Request $request) {
 /**
  * roleごとのログイン画面表示切り替え
  */
-Route::middleware(['web', 'guest'])->group(function () {
+Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'user'])
         ->name('login');
     Route::get('/admin/login', [LoginController::class, 'admin'])
@@ -42,7 +43,7 @@ Route::middleware(['web', 'guest'])->group(function () {
  * ログイン済一般ユーザー
  */
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/attendance', [AttendanceActionController::class, 'edit'])
+    Route::get('/attendance', [AttendanceActionController::class, 'index'])
         ->name('attendance');
     Route::post('/attendance/start', [AttendanceActionController::class, 'startWork'])
         ->name('attendance.start');
@@ -55,17 +56,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/attendance/list', [AttendanceController::class, 'index'])
         ->name('attendance.index');
-    Route::get('/attendance/detail/{attendance}', [AttendanceController::class, 'edit'])
+    Route::get('/attendance/detail/{attendance}', [AttendanceController::class, 'show'])
         ->name('attendance.edit');
 
-    Route::put('/attendance/detail/{attendance}', [CorrectRequestController::class, 'update'])
+    Route::put('/attendance/detail/{attendance}', [CorrectRequestController::class, 'store'])
         ->name('attendance.update');
 });
 
 /**
  * ログイン済ユーザー共通
  */
-Route::middleware(['auth', 'verified', 'switch.display'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/stamp_correction_request/list', [CorrectRequestController::class, 'index'])
         ->name('request.list');
 });
@@ -76,7 +77,7 @@ Route::middleware(['auth', 'verified', 'switch.display'])->group(function () {
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::get('/admin/attendance/list', [AdminAttendanceController::class, 'index'])
         ->name('admin.attendance.index');
-    Route::get('/admin/attendance/{attendance}', [AdminAttendanceController::class, 'edit'])
+    Route::get('/admin/attendance/{attendance}', [AdminAttendanceController::class, 'show'])
         ->name('admin.attendance.edit');
 
     Route::put('/admin/attendance/detail/{attendance}', [AdminAttendanceCorrectController::class, 'update'])
@@ -86,10 +87,10 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::put('/stamp_correction_request/approve/{attendance_correct_request}', [AdminAttendanceCorrectController::class, 'approve'])
         ->name('admin.request.approve');
 
-    Route::get('/admin/staff/list', [AdminStaffController::class, 'staffList'])
+    Route::get('/admin/staff/list', [AdminStaffController::class, 'index'])
         ->name('staff.list');
-    Route::get('/admin/attendance/staff/{staff}', [AdminStaffController::class, 'index'])
+    Route::get('/admin/attendance/staff/{staff}', [AdminStaffAttendanceController::class, 'index'])
         ->name('staff.attendance.list');
-    Route::get('/admin/attendance/staff/{staff}/export', [AdminStaffController::class, 'export'])
+    Route::get('/admin/attendance/staff/{staff}/export', [AdminStaffAttendanceController::class, 'export'])
         ->name('staff.attendance.export');
 });

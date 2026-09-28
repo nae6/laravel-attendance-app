@@ -35,7 +35,7 @@ class AttendanceController extends Controller
      * @param Attendance $attendance
      * @return View
      */
-    public function edit(Attendance $attendance): View {
+    public function show(Attendance $attendance): View {
         $this->authorize('view', $attendance);
 
         return view('user.detail', $this->attendanceService->getDetailData($attendance));

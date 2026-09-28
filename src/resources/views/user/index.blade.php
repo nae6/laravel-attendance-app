@@ -7,23 +7,24 @@
 @endsection
 
 @section('content')
+@php use App\Enums\AttendanceStatus; @endphp
 <div class="registration">
-    <p class="status">{{ $status }}</p>
+    <p class="status">{{ $status->value }}</p>
     <p class="date">{{ $now_date }}</p>
-    <p class="time" id="attendance-clock" data-is-fixed="{{ $status === '退勤済' ? 'true' : 'false' }}">
+    <p class="time" id="attendance-clock" data-is-fixed="{{ $status === AttendanceStatus::Finished ? 'true' : 'false' }}">
         {{ $now_time }}
     </p>
     @if (session('message'))
     <p class="stamp">{{ session('message')}}</p>
     @endif
     @switch($status)
-    @case('勤務外')
+    @case(AttendanceStatus::OffDuty)
     <form action="{{ route('attendance.start') }}" method="POST" class="form__btn">
         @csrf
         <button type="submit" class="form__btn--black">出勤</button>
     </form>
     @break
-    @case('出勤中')
+    @case(AttendanceStatus::Working)
     <div class="btn-wrapper">
         <form action="{{ route('attendance.end') }}" method="POST" class="form__btn">
             @csrf
@@ -36,13 +37,13 @@
         </form>
     </div>
     @break
-    @case('休憩中')
+    @case(AttendanceStatus::OnBreak)
     <form action="{{ route('break.end') }}" method="POST" class="form__btn">
         @csrf
         <button type="submit" class="form__btn--black">休憩戻</button>
     </form>
     @break
-    @case('退勤済')
+    @case(AttendanceStatus::Finished)
     <p class="see-you">お疲れ様でした。</p>
     @break
     @endswitch

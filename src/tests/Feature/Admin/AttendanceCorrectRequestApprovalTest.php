@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\tests\Feature\admin;
+namespace Tests\Feature\Admin;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Enums\AttendanceCorrectRequestStatus;
