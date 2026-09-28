@@ -15,7 +15,7 @@ class AdminAttendanceController extends Controller
     }
 
     /**
-     * 日時勤怠一覧画面の表示
+     * 日次勤怠一覧画面の表示
      *
      * @return View
      */
@@ -33,7 +33,7 @@ class AdminAttendanceController extends Controller
      * @param Attendance $attendance
      * @return View
      */
-    public function edit(Attendance $attendance): View {
+    public function show(Attendance $attendance): View {
         return view('admin.attendance_detail', $this->attendanceService->getDetailData($attendance));
     }
 }
