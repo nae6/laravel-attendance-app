@@ -8,6 +8,7 @@ use App\Http\Controllers\AttendanceActionController;
 use App\Http\Controllers\AdminAttendanceController;
 use App\Http\Controllers\CorrectRequestController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AdminStaffAttendanceController;
 use App\Http\Controllers\AdminStaffController;
 use App\Http\Controllers\LoginController;
 
@@ -86,10 +87,10 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::put('/stamp_correction_request/approve/{attendance_correct_request}', [AdminAttendanceCorrectController::class, 'approve'])
         ->name('admin.request.approve');
 
-    Route::get('/admin/staff/list', [AdminStaffController::class, 'staffList'])
+    Route::get('/admin/staff/list', [AdminStaffController::class, 'index'])
         ->name('staff.list');
-    Route::get('/admin/attendance/staff/{staff}', [AdminStaffController::class, 'index'])
+    Route::get('/admin/attendance/staff/{staff}', [AdminStaffAttendanceController::class, 'index'])
         ->name('staff.attendance.list');
-    Route::get('/admin/attendance/staff/{staff}/export', [AdminStaffController::class, 'export'])
+    Route::get('/admin/attendance/staff/{staff}/export', [AdminStaffAttendanceController::class, 'export'])
         ->name('staff.attendance.export');
 });
