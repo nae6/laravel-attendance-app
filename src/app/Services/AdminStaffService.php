@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Support\Collection;
 
@@ -12,7 +13,7 @@ class AdminStaffService
      */
     public function getStaffList(): Collection
     {
-        return User::where('role', 'user')
+        return User::where('role', UserRole::User)
             ->select('id', 'name', 'email')
             ->get();
     }

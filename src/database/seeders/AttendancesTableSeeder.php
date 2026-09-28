@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\BreakRecord;
 use App\Models\Attendance;
+use App\Enums\UserRole;
 use App\Models\User;
 use Carbon\CarbonPeriod;
 use Carbon\Carbon;
@@ -16,7 +17,7 @@ class AttendancesTableSeeder extends Seeder
      */
     public function run(): void
     {
-        User::where('role', 'user')->each(function ($user) {
+        User::where('role', UserRole::User)->each(function ($user) {
             // 前月の日付一覧
             $base = Carbon::now()->subMonthNoOverflow();
 
