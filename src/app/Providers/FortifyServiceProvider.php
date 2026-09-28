@@ -14,6 +14,7 @@ use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 use Laravel\Fortify\Contracts\RegisterResponse;
 use Laravel\Fortify\Fortify;
 use App\Actions\Fortify\CreateNewUser;
+use App\Enums\UserRole;
 use App\Http\Responses\LogoutResponse;
 use App\Http\Responses\LoginResponse;
 use App\Http\Requests\LoginRequest;
@@ -63,7 +64,7 @@ class FortifyServiceProvider extends ServiceProvider
             $validated = $formRequest->validated();
 
             $user = User::where('email', $validated['email'])->first();
-            $role = $request->login_type === 'admin' ? 'admin' : 'user';
+            $role = $request->login_type === UserRole::Admin->value ? UserRole::Admin : UserRole::User;
 
             if (! $user) {
                 throw ValidationException::withMessages([

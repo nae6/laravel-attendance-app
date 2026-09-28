@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Enums\UserRole;
 use App\Models\Attendance;
 use App\Models\AttendanceCorrectRequest;
 
@@ -14,7 +15,7 @@ class AttendanceCorrectRequestSeeder extends Seeder
     public function run(): void
     {
         $attendances = Attendance::whereHas('user', function ($query) {
-            $query->where('role', 'user');
+            $query->where('role', UserRole::User);
         })
             ->inRandomOrder()
             ->take(5)

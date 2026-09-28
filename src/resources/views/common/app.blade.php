@@ -18,7 +18,7 @@
                 <img src="{{ asset('images/header_logo.png') }}" alt="coachtech logo">
             </a>
             @auth
-                @if(Auth::user()->role === 'admin')
+                @if(Auth::user()->isAdmin())
                     @include('common.admin_header')
                 @else
                     @include('common.user_header')
