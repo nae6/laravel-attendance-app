@@ -18,10 +18,13 @@ class BreakRecord extends Model
         'break_end',
     ];
 
-    protected $casts = [
-        'break_start' => 'datetime',
-        'break_end' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'break_start' => 'datetime',
+            'break_end' => 'datetime',
+        ];
+    }
 
     /**
      * 勤怠情報を取得

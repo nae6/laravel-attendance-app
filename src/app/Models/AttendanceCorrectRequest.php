@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -35,14 +36,16 @@ class AttendanceCorrectRequest extends Model
     /**
      * 修正申請の承認状態（日本語設定）
      *
-     * @return string
+     * @return Attribute<string, never>
      */
-    public function getStatusLabelAttribute(): string {
-        return match ($this->approval_status) {
-            AttendanceCorrectRequestStatus::Pending => '承認待ち',
-            AttendanceCorrectRequestStatus::Approved => '承認済み',
-            AttendanceCorrectRequestStatus::Rejected => '否認',
-        };
+    protected function statusLabel(): Attribute {
+        return Attribute::make(
+            get: fn (): string => match ($this->approval_status) {
+                AttendanceCorrectRequestStatus::Pending => '承認待ち',
+                AttendanceCorrectRequestStatus::Approved => '承認済み',
+                AttendanceCorrectRequestStatus::Rejected => '否認',
+            },
+        );
     }
 
     /**
