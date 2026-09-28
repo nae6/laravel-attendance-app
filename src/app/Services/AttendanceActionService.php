@@ -59,6 +59,7 @@ class AttendanceActionService
             'user_id' => $userId,
             'check_in' => now(),
             'check_out' => null,
+            'status' => AttendanceStatus::Working,
         ]);
     }
 
