@@ -89,7 +89,6 @@
         <tr class="table__row">
             <th>日付</th>
             <td>
-                <input type="hidden" name="date" value="{{ $attendance->check_in->format('Y-m-d') }}">
                 <div class="datetime">
                     <span class="table__date--space">
                         {{ $attendance?->check_in->format('Y年') }}
