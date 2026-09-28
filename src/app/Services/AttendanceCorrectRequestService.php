@@ -8,6 +8,7 @@ use App\Exceptions\AlreadyApprovedException;
 use App\Models\Attendance;
 use App\Models\AttendanceCorrectRequest;
 use App\Models\BreakCorrectRequest;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -23,12 +24,12 @@ class AttendanceCorrectRequestService
     public function createUserRequest(Attendance $attendance, array $validated): void
     {
         DB::transaction(function () use ($attendance, $validated) {
-            $attendanceDate = $attendance->check_in->toDateString();
+            $date = $attendance->check_in->toDateString();
 
             $correctRequest = AttendanceCorrectRequest::create([
                 'attendance_id' => $attendance->id,
-                'requested_check_in' => Carbon::parse($attendanceDate . ' ' . $validated['check_in']),
-                'requested_check_out' => Carbon::parse($attendanceDate . ' ' . $validated['check_out']),
+                'requested_check_in' => $this->toDateTime($date, $validated['check_in']),
+                'requested_check_out' => $this->toDateTime($date, $validated['check_out']),
                 'reason' => $validated['reason'],
             ]);
 
@@ -39,8 +40,8 @@ class AttendanceCorrectRequestService
 
                 BreakCorrectRequest::create([
                     'attendance_correct_request_id' => $correctRequest->id,
-                    'requested_break_start' => Carbon::parse($attendanceDate . ' ' . $break['break_start']),
-                    'requested_break_end' => Carbon::parse($attendanceDate . ' ' . $break['break_end']),
+                    'requested_break_start' => $this->toDateTime($date, $break['break_start']),
+                    'requested_break_end' => $this->toDateTime($date, $break['break_end']),
                 ]);
             }
         });
@@ -49,17 +50,18 @@ class AttendanceCorrectRequestService
     /**
      * 申請一覧画面の表示に必要な情報を取得する(user/admin共通)
      *
-     * @param string|null $viewType
-     * @param int|null $userId
+     * 管理者は全ユーザー、一般ユーザーは自分の申請のみを対象とする
+     *
+     * @param User $user
      * @return array{pendingRequests: \Illuminate\Support\Collection, approvedRequests: \Illuminate\Support\Collection}
      */
-    public function getRequestListData(?string $viewType, ?int $userId): array
+    public function getRequestListData(User $user): array
     {
         $baseQuery = AttendanceCorrectRequest::with('attendance.user')
             ->latest('created_at');
 
-        if ($viewType === 'user') {
-            $baseQuery->forUser($userId);
+        if (!$user->isAdmin()) {
+            $baseQuery->forUser($user->id);
         }
 
         $pendingRequests = (clone $baseQuery)
@@ -79,7 +81,7 @@ class AttendanceCorrectRequestService
      * @param array $break
      * @return bool
      */
-    public function isEmptyBreak(array $break): bool
+    private function isEmptyBreak(array $break): bool
     {
         return empty($break['break_start']) && empty($break['break_end']);
     }
@@ -212,20 +214,17 @@ class AttendanceCorrectRequestService
 
             $attendance = $attendanceCorrectRequest->attendance;
             $attendance->update([
-                'check_in' => $attendanceCorrectRequest['requested_check_in'],
-                'check_out' => $attendanceCorrectRequest['requested_check_out'],
+                'check_in' => $attendanceCorrectRequest->requested_check_in,
+                'check_out' => $attendanceCorrectRequest->requested_check_out,
             ]);
 
             $attendance->breakRecords()->delete();
 
+            // 休憩の修正申請は空行を除いて保存しているため、すべて反映する
             foreach ($attendanceCorrectRequest->breakCorrectRequests as $break) {
-                if (empty($break['requested_break_start']) && empty($break['requested_break_end'])) {
-                    continue;
-                }
-
                 $attendance->breakRecords()->create([
-                    'break_start' => $break['requested_break_start'],
-                    'break_end' => $break['requested_break_end'],
+                    'break_start' => $break->requested_break_start,
+                    'break_end' => $break->requested_break_end,
                 ]);
             }
         });
