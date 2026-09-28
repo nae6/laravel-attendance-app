@@ -271,4 +271,55 @@ class AdminAttendanceShowTest extends TestCase
         $this->assertDatabaseCount('break_records', 0);
         $this->assertDatabaseCount('break_correct_requests', 0);
     }
+
+    /**
+     * 改ざんされたdateを送っても対象勤怠の日付で保存される
+     */
+    public function test_admin_update_uses_attendance_date_instead_of_request_date(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
+        $user = User::factory()->create();
+
+        $attendance = Attendance::factory()->create([
+            'user_id' => $user->id,
+            'check_in' => '2026-05-02 10:00:00',
+            'check_out' => '2026-05-02 17:00:00',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->from(route('admin.attendance.edit', $attendance->id))
+            ->put(route('admin.attendance.update', $attendance->id), [
+                'date' => '2020-01-01',
+                'check_in' => '09:00',
+                'check_out' => '18:00',
+                'breaks' => [
+                    [
+                        'break_start' => '12:00',
+                        'break_end' => '13:00',
+                    ],
+                ],
+                'reason' => '修正テスト',
+            ]);
+
+        $response->assertRedirect(route('admin.attendance.index', $attendance));
+
+        $attendance->refresh();
+        $this->assertSame('2026-05-02 09:00:00', $attendance->check_in->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-05-02 18:00:00', $attendance->check_out->format('Y-m-d H:i:s'));
+
+        $this->assertDatabaseHas('break_records', [
+            'attendance_id' => $attendance->id,
+            'break_start' => '2026-05-02 12:00:00',
+            'break_end' => '2026-05-02 13:00:00',
+        ]);
+
+        $this->assertDatabaseHas('attendance_correct_requests', [
+            'attendance_id' => $attendance->id,
+            'requested_check_in' => '2026-05-02 09:00:00',
+            'requested_check_out' => '2026-05-02 18:00:00',
+        ]);
+    }
 }
