@@ -45,7 +45,7 @@ class AttendanceService
 
         $attendances = Attendance::with('breakRecords')
             ->where('user_id', $userId)
-            ->whereBetween('check_in', [$startOfMonth, $endOfMonth->endOfDay()])
+            ->whereBetween('check_in', [$startOfMonth, $endOfMonth->copy()->endOfDay()])
             ->get()
             ->keyBy(fn (Attendance $attendance) => $attendance->check_in->format('Y-m-d'));
 
