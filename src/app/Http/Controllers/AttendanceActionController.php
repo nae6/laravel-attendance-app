@@ -7,9 +7,9 @@ use App\Exceptions\AlreadyClockedOutException;
 use App\Exceptions\NoActiveBreakException;
 use App\Exceptions\NotClockedInException;
 use App\Services\AttendanceActionService;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AttendanceActionController extends Controller
@@ -24,8 +24,8 @@ class AttendanceActionController extends Controller
      *
      * @return View
      */
-    public function index(): View {
-        $data = $this->attendanceActionService->getAttendanceActionData(Auth::id());
+    public function index(Request $request): View {
+        $data = $this->attendanceActionService->getAttendanceActionData($request->user()->id);
 
         return view('user.index', $data);
     }
@@ -35,9 +35,9 @@ class AttendanceActionController extends Controller
      *
      * @return RedirectResponse
      */
-    public function startWork(): RedirectResponse {
+    public function startWork(Request $request): RedirectResponse {
         try {
-            $this->attendanceActionService->startWork(Auth::id());
+            $this->attendanceActionService->startWork($request->user()->id);
         } catch (AlreadyClockedInException) {
             return $this->redirectWith('message', '本日の出勤は打刻済みです');
         }
@@ -50,16 +50,16 @@ class AttendanceActionController extends Controller
      *
      * @return RedirectResponse
      */
-    public function startBreak(): RedirectResponse {
+    public function startBreak(Request $request): RedirectResponse {
         try {
-            $this->attendanceActionService->startBreak(Auth::id());
+            $this->attendanceActionService->startBreak($request->user()->id);
         } catch (NotClockedInException) {
             return $this->redirectWith('message', '本日の出勤記録がありません');
         } catch (AlreadyClockedOutException) {
             return $this->redirectWith('message', '本日は退勤済みです');
         } catch (\Throwable $e) {
             Log::error('休憩開始の打刻に失敗', [
-                'user_id' => Auth::id(),
+                'user_id' => $request->user()->id,
                 'error' => $e->getMessage(),
             ]);
 
@@ -74,9 +74,9 @@ class AttendanceActionController extends Controller
      *
      * @return RedirectResponse
      */
-    public function endBreak(): RedirectResponse {
+    public function endBreak(Request $request): RedirectResponse {
         try {
-            $this->attendanceActionService->endBreak(Auth::id());
+            $this->attendanceActionService->endBreak($request->user()->id);
         } catch (NotClockedInException) {
             return $this->redirectWith('message', '本日の出勤記録がありません');
         } catch (AlreadyClockedOutException) {
@@ -85,7 +85,7 @@ class AttendanceActionController extends Controller
             return $this->redirectWith('message', '終了できる休憩がありません');
         } catch (\Throwable $e) {
             Log::error('休憩終了の打刻に失敗', [
-                'user_id' => Auth::id(),
+                'user_id' => $request->user()->id,
                 'error' => $e->getMessage(),
             ]);
 
@@ -100,9 +100,9 @@ class AttendanceActionController extends Controller
      *
      * @return RedirectResponse
      */
-    public function endWork(): RedirectResponse {
+    public function endWork(Request $request): RedirectResponse {
         try {
-            $this->attendanceActionService->endWork(Auth::id());
+            $this->attendanceActionService->endWork($request->user()->id);
         } catch (NotClockedInException) {
             return $this->redirectWith('message', '本日の出勤記録がありません');
         } catch (AlreadyClockedOutException) {
