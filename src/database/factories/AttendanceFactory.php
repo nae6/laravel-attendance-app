@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Enums\AttendanceStatus;
 use App\Models\Attendance;
 use App\Models\User;
 use Carbon\Carbon;
@@ -25,7 +26,7 @@ class AttendanceFactory extends Factory
             'user_id' => User::factory(),
             'check_in' => $checkIn,
             'check_out' => $checkOut,
-            'status' => '退勤済',
+            'status' => AttendanceStatus::Finished,
         ];
     }
 }

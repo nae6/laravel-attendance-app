@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\AttendanceCorrectRequestStatus;
+use App\Enums\AttendanceStatus;
 use App\Models\Attendance;
 use App\Models\AttendanceCorrectRequest;
 use App\Models\BreakCorrectRequest;
@@ -99,7 +100,7 @@ class AttendanceCorrectRequestService
             $attendance->update([
                 'check_in' => $this->toDateTime($validated['date'], $validated['check_in']),
                 'check_out' => $this->toDateTime($validated['date'], $validated['check_out']),
-                'status' => '退勤済',
+                'status' => AttendanceStatus::Finished,
             ]);
 
             $this->replaceBreakRecords($attendance, $validated);
