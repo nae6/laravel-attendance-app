@@ -251,8 +251,10 @@ php artisan migrate:fresh --seed
 - バリデーション条件にDBに保存したい値全てを含むことで、バリデーションを通ったデータのみをデータベースに保存できるようにした点（精査されてないデータを含まない仕様）
 - transactionを使用した不要なデータが保存されない実装
 - 複数処理のある機能にtry-catchを使用し、予期しないエラーを対策
-- 勤怠打刻処理ではControllerとServiceの責務を分離し、Controllerはリクエスト受付・画面遷移・レスポンス返却に集中させ、出勤・休憩・退勤などの業務ロジックはAttendanceActionServiceに集約
-- 業務ロジックをServiceに分けることで、処理の見通しを良くし、今後の仕様変更やテスト追加時にControllerへ複雑な処理が増えすぎないようにした点
+- Controllerはリクエスト受付・画面遷移・レスポンス返却に集中させ、業務ロジックはServiceクラスへ集約（AttendanceActionService／AttendanceService／AttendanceCorrectRequestService／AdminStaffService）。処理の見通しを良くし、今後の仕様変更やテスト追加時にControllerへ複雑な処理が増えすぎないようにした
+- 権限判定もControllerから分離し、Policy/Gateへ集約
+  - 管理者判定のようなモデルに依存しない全体権限はGate（`Gate::define('access-admin', ...)`）
+  - 勤怠情報の所有者チェックやスタッフ閲覧可否など特定モデルに対する権限はPolicy（`AttendancePolicy` / `UserPolicy`）
 
 ---
 
@@ -264,6 +266,5 @@ php artisan migrate:fresh --seed
 
 ## 今後の改善予定
 
-- コントローラーにある機能をサービスクラスに分離
 - 勤怠の集計・レポート画面を追加
 - 管理者・ユーザーのログイン画面への誘導用トップページを準備する
