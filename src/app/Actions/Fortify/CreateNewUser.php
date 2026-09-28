@@ -10,8 +10,6 @@ use App\Http\Requests\RegisterRequest;
 
 class CreateNewUser implements CreatesNewUsers
 {
-    use PasswordValidationRules;
-
     /**
      * Validate and create a newly registered user.
      *
@@ -19,12 +17,14 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input): User
     {
-        $request = app(RegisterRequest::class);
+        // コンテナ経由で解決するとFormRequestの自動バリデーションが走るため、
+        // ルールとメッセージの定義元としてのみ直接インスタンス化する
+        $registerRequest = new RegisterRequest();
 
         Validator::make(
             $input,
-            $request->rules(),
-            $request->messages(),
+            $registerRequest->rules(),
+            $registerRequest->messages(),
         )->validate();
 
         return User::create([

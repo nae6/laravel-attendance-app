@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AttendanceCorrectRequestFormRequest;
 use App\Services\AttendanceCorrectRequestService;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -48,10 +47,8 @@ class CorrectRequestController extends Controller
      * @return View
      */
     public function index(Request $request): View {
-        $viewType = $request->user()->isAdmin() ? 'admin' : 'user';
+        $data = $this->attendanceCorrectRequestService->getRequestListData($request->user());
 
-        $data = $this->attendanceCorrectRequestService->getRequestListData($viewType, Auth::id());
-
-        return view('common.request_history', array_merge($data, compact('viewType')));
+        return view('common.request_history', $data);
     }
 }

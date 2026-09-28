@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -51,9 +53,10 @@ class AttendanceCorrectRequest extends Model
     /**
      * ログインユーザーの勤怠履歴を取得
      */
-    public function scopeForUser($query, $userId)
+    #[Scope]
+    protected function forUser(Builder $query, int $userId): void
     {
-        return $query->whereHas('attendance', function ($q) use ($userId) {
+        $query->whereHas('attendance', function (Builder $q) use ($userId) {
             $q->where('user_id', $userId);
         });
     }
