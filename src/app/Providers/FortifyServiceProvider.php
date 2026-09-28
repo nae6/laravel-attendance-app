@@ -58,12 +58,9 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
         // loginのカスタマイズ
+        // 入力値のバリデーションはregister()でバインドしたLoginRequestの解決時に実行済み
         Fortify::authenticateUsing(function (Request $request) {
-            $formRequest = LoginRequest::createFrom($request);
-            $formRequest->setContainer(app())->validateResolved();
-            $validated = $formRequest->validated();
-
-            $user = User::where('email', $validated['email'])->first();
+            $user = User::where('email', $request->email)->first();
             $role = $request->login_type === UserRole::Admin->value ? UserRole::Admin : UserRole::User;
 
             if (! $user) {
