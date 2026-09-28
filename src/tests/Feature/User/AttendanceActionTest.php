@@ -14,6 +14,17 @@ class AttendanceActionTest extends TestCase
     use RefreshDatabase;
 
     /**
+     * 打刻は「当日」の勤怠を対象にするため、テストデータの時刻(now()->subHours(8)等)が
+     * 前日にずれないよう、日中の固定日時で現在時刻を固定する
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->travelTo(Carbon::parse('2026-06-10 18:00:00'));
+    }
+
+    /**
      * 勤怠登録画面の現在日時の表示
      */
     public function test_attendance_page_shows_current_date_and_time(): void {
