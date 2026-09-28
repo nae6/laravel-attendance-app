@@ -24,7 +24,7 @@ class AttendanceActionController extends Controller
      *
      * @return View
      */
-    public function edit(): View {
+    public function index(): View {
         $data = $this->attendanceActionService->getAttendanceActionData(Auth::id());
 
         return view('user.index', $data);

@@ -43,7 +43,7 @@ Route::middleware(['web', 'guest'])->group(function () {
  * ログイン済一般ユーザー
  */
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/attendance', [AttendanceActionController::class, 'edit'])
+    Route::get('/attendance', [AttendanceActionController::class, 'index'])
         ->name('attendance');
     Route::post('/attendance/start', [AttendanceActionController::class, 'startWork'])
         ->name('attendance.start');
@@ -56,10 +56,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/attendance/list', [AttendanceController::class, 'index'])
         ->name('attendance.index');
-    Route::get('/attendance/detail/{attendance}', [AttendanceController::class, 'edit'])
+    Route::get('/attendance/detail/{attendance}', [AttendanceController::class, 'show'])
         ->name('attendance.edit');
 
-    Route::put('/attendance/detail/{attendance}', [CorrectRequestController::class, 'update'])
+    Route::put('/attendance/detail/{attendance}', [CorrectRequestController::class, 'store'])
         ->name('attendance.update');
 });
 
@@ -77,7 +77,7 @@ Route::middleware(['auth', 'verified', 'switch.display'])->group(function () {
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::get('/admin/attendance/list', [AdminAttendanceController::class, 'index'])
         ->name('admin.attendance.index');
-    Route::get('/admin/attendance/{attendance}', [AdminAttendanceController::class, 'edit'])
+    Route::get('/admin/attendance/{attendance}', [AdminAttendanceController::class, 'show'])
         ->name('admin.attendance.edit');
 
     Route::put('/admin/attendance/detail/{attendance}', [AdminAttendanceCorrectController::class, 'update'])

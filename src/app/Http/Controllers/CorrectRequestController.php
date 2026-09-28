@@ -23,7 +23,7 @@ class CorrectRequestController extends Controller
      *
      * @return RedirectResponse
      */
-    public function update(AttendanceCorrectRequestFormRequest $request, Attendance $attendance): RedirectResponse {
+    public function store(AttendanceCorrectRequestFormRequest $request, Attendance $attendance): RedirectResponse {
         $this->authorize('view', $attendance);
 
         try {
