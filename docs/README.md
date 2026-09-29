@@ -17,12 +17,13 @@ Laravelを用いて開発した勤怠管理アプリです。
 
 ## 使用技術
 
-- PHP: 8.4.17
-- Laravel: 12.12.2
-- DB: MySQL
-- MySQL: 8.0
+- PHP: 8.4（Dockerイメージ `php:8.4-fpm`）
+- Laravel: 12.62.0
+- Laravel Fortify: 1.37.2（認証・メール認証）
+- DB: MySQL 8.0
 - nginx: 1.28.1
 - View: Blade
+- メール確認: MailHog
 - Docker / Docker Compose
 
 ---
@@ -51,6 +52,27 @@ Laravelを用いて開発した勤怠管理アプリです。
 - 勤怠修正
 - 修正申請一覧表示
 - 修正申請承認
+
+---
+
+## ディレクトリ構成（app配下）
+
+Laravel公式の標準構成に沿って、役割ごとにフォルダを分けています。
+
+| フォルダ | 役割 |
+|---|---|
+| `Http/Controllers` | リクエストの受付・レスポンス返却のみを担当（1リソース1コントローラー） |
+| `Http/Requests` | FormRequestによるバリデーション |
+| `Http/Middleware` | 管理者判定などリクエストの通過可否の判定 |
+| `Http/Responses` | Fortifyのレスポンス（登録・ログイン・ログアウト・メール認証後の遷移先）のカスタマイズ |
+| `Services` | 業務ロジック |
+| `Exceptions` | 業務エラーを表す例外 |
+| `Policies` | モデルに対する認可 |
+| `Enums` | 勤怠ステータス・ユーザーロール・申請ステータス |
+| `Models` | Eloquentモデル |
+| `Actions/Fortify` | Fortifyのユーザー登録処理 |
+
+画面は `resources/views/components/attendance` に一般ユーザー・管理者で共通のBladeコンポーネント（月次勤怠一覧の表、勤怠修正フォームなど）をまとめています。
 
 ---
 
@@ -208,6 +230,18 @@ php artisan migrate:fresh --seed
    - 詳細画面から申請内容を確認できる
    - 修正申請を承認できる
 
+#### 会員登録・メール認証
+
+1. 会員登録画面にアクセス  
+   <http://localhost/register>
+
+2. 名前・メールアドレス・パスワードを入力して登録
+
+3. メール認証誘導画面の「認証はこちらから」からMailHogを開き、届いた認証メールのリンクをクリック  
+   <http://localhost:8025>
+
+4. 認証完了後、勤怠登録画面に遷移する
+
 #### スタッフ画面
 
 1. 一般ユーザー用ログイン画面にアクセス  
@@ -255,6 +289,11 @@ php artisan migrate:fresh --seed
   - 「出勤記録がない」「承認済みの申請を再承認しようとした」などの業務エラーはServiceから例外（`app/Exceptions`）で通知し、画面に表示するメッセージの組み立てやログ出力はController側で行う
   - Controllerは1リソース1コントローラーとし、メソッド名もリソースコントローラーの規約（index／show／store など）に合わせた
 - 勤怠ステータス（勤務外／出勤中／休憩中／退勤済）・ユーザーロール（admin／user）・申請ステータスはEnum（`app/Enums`）で管理し、文字列の直書きをなくした
+- 管理者の勤怠修正では、画面から送られる日付ではなく勤怠レコード自身の日付を使って日時を組み立て、hidden inputの改ざんで別の日付に保存されないようにした
+- 認証まわりはLaravel Fortifyの仕組みに寄せて実装
+  - 登録・ログイン・ログアウト・メール認証後の遷移先は、Fortifyのレスポンスクラス（`app/Http/Responses`）で管理者／一般ユーザーごとに切り替え
+  - メール認証のルートはFortify標準のものを使用し、独自定義による重複をなくした
+- 一般ユーザーと管理者で共通の画面部品（月次勤怠一覧の表、勤怠修正フォーム、承認待ち表示）はBladeコンポーネントにまとめ、表示の差異や修正漏れが起きにくいようにした
 - 権限判定もControllerから分離し、Policy/Gateへ集約
   - 管理者判定のようなモデルに依存しない全体権限はGate（`Gate::define('access-admin', ...)`）
   - 勤怠情報の所有者チェックやスタッフ閲覧可否など特定モデルに対する権限はPolicy（`AttendancePolicy` / `UserPolicy`）
@@ -266,6 +305,7 @@ php artisan migrate:fresh --seed
 - Carbonを用いた日時の表示
 - 日時データの取り扱い
 - テスト用のデータセット作成
+- 実行時刻によって結果が変わるテストの対応（深夜に実行すると出勤日が前日扱いになるため、`travelTo()` でテスト内の現在時刻を固定）
 
 ## 今後の改善予定
 
