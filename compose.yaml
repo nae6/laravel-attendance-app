@@ -1,6 +1,6 @@
 services:
     nginx:
-        image: nginx:1.28.1
+        image: nginx:1.30.6
         ports:
             - "80:80"
         volumes:
@@ -28,8 +28,7 @@ services:
             - "3306:3306"
 
     phpmyadmin:
-        image: phpmyadmin/phpmyadmin
-        platform: linux/amd64
+        image: phpmyadmin:5.2.3-apache
         environment:
             - PMA_ARBITRARY=1
             - PMA_HOST=mysql
