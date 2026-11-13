@@ -39,11 +39,11 @@ services:
         ports:
             - 8080:80
 
-    mailhog:
-        image: mailhog/mailhog:latest
+    mailpit:
+        image: axllent/mailpit:latest
         ports:
-            - "8025:8025"
-            - "1025:1025"
+            - "127.0.0.1:8025:8025"
+            - "127.0.0.1:1025:1025"
 
 volumes:
     db-data:

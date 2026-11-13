@@ -23,7 +23,7 @@ Laravelを用いて開発した勤怠管理アプリです。
 - DB: MySQL 8.0
 - nginx: 1.28.1
 - View: Blade
-- メール確認: MailHog
+- メール確認: Mailpit
 - Docker / Docker Compose
 
 ---
@@ -140,7 +140,7 @@ DB_USERNAME=attendance_user
 DB_PASSWORD=attendance_pass  
 
 MAIL_MAILER=smtp  
-MAIL_HOST=mailhog  
+MAIL_HOST=mailpit  
 MAIL_PORT=1025  
 
 - 設定後はキャッシュをクリアしてください
@@ -237,7 +237,7 @@ php artisan migrate:fresh --seed
 
 2. 名前・メールアドレス・パスワードを入力して登録
 
-3. メール認証誘導画面の「認証はこちらから」からMailHogを開き、届いた認証メールのリンクをクリック  
+3. メール認証誘導画面の「認証はこちらから」からMailpitを開き、届いた認証メールのリンクをクリック
    <http://localhost:8025>
 
 4. 認証完了後、勤怠登録画面に遷移する
