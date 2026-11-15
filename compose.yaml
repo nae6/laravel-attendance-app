@@ -27,18 +27,6 @@ services:
         ports:
             - "3306:3306"
 
-    phpmyadmin:
-        image: phpmyadmin:5.2.3-apache
-        environment:
-            - PMA_ARBITRARY=1
-            - PMA_HOST=mysql
-            - PMA_USER=attendance_user
-            - PMA_PASSWORD=attendance_pass
-        depends_on:
-            - mysql
-        ports:
-            - "127.0.0.1:8080:80"
-
     mailpit:
         image: axllent/mailpit:v1.33.1
         ports:
