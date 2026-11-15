@@ -4,7 +4,6 @@ COPY php.ini /usr/local/etc/php/
 
 RUN apt update \
     && apt install -y --no-install-recommends \
-        default-mysql-client \
         zlib1g-dev \
         libzip-dev \
         libicu-dev \
