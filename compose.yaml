@@ -15,7 +15,9 @@ services:
             - ./src:/var/www/
 
     mysql:
-        image: mysql:8.4
+        build:
+            context: .
+            dockerfile: docker/mysql/Dockerfile
         environment:
             MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: attendance_db
@@ -25,7 +27,7 @@ services:
             - db-data-mysql84:/var/lib/mysql
             - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
         ports:
-            - "3306:3306"
+            - "127.0.0.1:3306:3306"
 
     mailpit:
         image: axllent/mailpit:v1.33.1
