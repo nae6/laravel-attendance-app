@@ -1,6 +1,6 @@
 services:
     nginx:
-        image: nginx:1.30.6
+        build: ./docker/nginx
         ports:
             - "80:80"
         volumes:
