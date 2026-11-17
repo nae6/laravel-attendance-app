@@ -9,7 +9,6 @@ RUN apt update \
         libicu-dev \
         unzip \
         curl \
-        git \
     && docker-php-ext-install pdo_mysql zip intl \
     && pecl install xdebug \
     && docker-php-ext-enable xdebug \
