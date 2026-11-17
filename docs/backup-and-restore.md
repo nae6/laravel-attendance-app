@@ -8,17 +8,17 @@ PHP、Laravel、MySQL、Dockerなどのアップデート時に問題が発生�
 
 ## 2. 対象環境
 
-| 項目 | 更新前の環境 |
-|---|---|
-| アプリケーション | Laravel 12.62.0 |
-| PHP | 8.4.23 |
-| MySQL | 8.0.26 |
-| Webサーバー | Nginx 1.28.1 |
-| コンテナ管理 | Docker Compose |
-| データベース名 | attendance_db |
-| データ保存先 | Docker named volume: db-data |
+| 項目 | 現在の環境 | 更新前の環境（Issue 2実施時点） |
+|---|---|---|
+| アプリケーション | Laravel 13.40.0 | Laravel 12.62.0 |
+| PHP | 8.5.12 | 8.4.23 |
+| MySQL | 8.4.13 | 8.0.26 |
+| Webサーバー | Nginx 1.30.6 | Nginx 1.28.1 |
+| コンテナ管理 | Docker Compose | Docker Compose |
+| データベース名 | attendance_db | attendance_db |
+| データ保存先 | Docker named volume: db-data-mysql84 | Docker named volume: db-data |
 
-※ 上記はIssue 2実施時点の環境。今後の更新時には対象バージョンを確認すること。
+※ 現在の環境は2026年11月時点。今後の更新時には対象バージョンを確認すること。
 
 ## 3. バックアップ対象
 
@@ -140,10 +140,12 @@ docker run -d \
   --network none \
   -e MYSQL_ROOT_PASSWORD=restore_test_password \
   -e MYSQL_DATABASE=restore_test_db \
-  mysql:8.0.26
+  mysql:8.4
 ```
 
-既存のDockerボリューム `db-data` は使用しない。
+イメージのバージョンは、バックアップを取得したMySQLと同じメジャー・マイナーバージョンに合わせる。
+
+既存のDockerボリューム `db-data-mysql84` は使用しない。
 
 ### 5.3 MySQLの起動確認
 
@@ -301,8 +303,8 @@ MySQLのアップグレード後に障害が発生した場合、更新済みの
 
 ## 9. 参考資料
 
-- [MySQL 8.0 Reference Manual - mysqldump](https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html)
-- [MySQL 8.0 Reference Manual - Reloading SQL-Format Backups](https://dev.mysql.com/doc/refman/8.0/en/reloading-sql-format-dumps.html)
+- [MySQL 8.4 Reference Manual - mysqldump](https://dev.mysql.com/doc/refman/8.4/en/mysqldump.html)
+- [MySQL 8.4 Reference Manual - Reloading SQL-Format Backups](https://dev.mysql.com/doc/refman/8.4/en/reloading-sql-format-dumps.html)
 - [Docker CLI - docker run](https://docs.docker.com/reference/cli/docker/container/run/)
 - [Docker CLI - docker exec](https://docs.docker.com/reference/cli/docker/container/exec/)
-- [Laravel 12 - Configuration](https://laravel.com/docs/12.x/configuration)
+- [Laravel 13 - Configuration](https://laravel.com/docs/13.x/configuration)
