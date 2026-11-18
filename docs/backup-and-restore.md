@@ -4,7 +4,9 @@
 
 本ドキュメントは、勤怠管理アプリケーション（attendance-management）のバックアップおよび復旧手順を定義する。
 
-PHP、Laravel、MySQL、Dockerなどのアップデート時に問題が発生した場合でも、更新前の状態へ復旧できるようにすることを目的とする。
+PHP、Laravel、MySQL、Dockerなどのアップデート時に問題が発生した場合でも、更新前の状態へ復旧できるようにすることを目的とする。セキュリティ更新時の影響調査、対応判断、更新後の検証については、[セキュリティ更新手順書](security-update.md) を参照する。
+
+本手順書では、バックアップの取得、復元テスト、障害発生時の復旧方法を扱う。
 
 ## 2. 対象環境
 
@@ -303,6 +305,8 @@ MySQLのアップグレード後に障害が発生した場合、更新済みの
 
 ## 9. 参考資料
 
+- [セキュリティ更新手順書](security-update.md)
+- [README：環境構築・動作確認](README.md)
 - [MySQL 8.4 Reference Manual - mysqldump](https://dev.mysql.com/doc/refman/8.4/en/mysqldump.html)
 - [MySQL 8.4 Reference Manual - Reloading SQL-Format Backups](https://dev.mysql.com/doc/refman/8.4/en/reloading-sql-format-dumps.html)
 - [Docker CLI - docker run](https://docs.docker.com/reference/cli/docker/container/run/)
