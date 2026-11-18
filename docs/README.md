@@ -227,106 +227,27 @@ docker compose up -d
 
 ## Composer依存関係の更新
 
-PHPコンテナ内で実行します。
+Composerパッケージの更新方法、依存関係の互換性確認、更新後の検証については、[セキュリティ更新手順書](security-update.md) を参照してください。
 
-```bash
-docker compose exec php bash
-```
-
-1. 更新可能なパッケージを確認します。
-
-   ```bash
-   composer outdated --direct
-   ```
-
-2. パッケージを更新します。メジャーバージョンを上げる場合は、`composer.json` のバージョン制約を変更し、公式のアップグレードガイドを確認してください。
-
-   ```bash
-   # composer.json の制約の範囲で全体を更新
-   composer update
-
-   # 特定のパッケージのみ更新
-   composer update laravel/framework --with-all-dependencies
-   ```
-
-3. 脆弱性と動作を確認します。
-
-   ```bash
-   composer audit
-   php artisan test
-   ```
-
-4. 問題がなければ `composer.json` と `composer.lock` をコミットします。
-
-- PHPコンテナには `git` をインストールしていません。Composerは全パッケージをdist（zip）で取得するため通常は不要ですが、VCSリポジトリを依存に追加する場合などはホスト側でComposerを実行してください。
+この手順は、通常の依存関係更新にも利用できます。
 
 ---
 
 ## セキュリティ検査
 
-### Composerパッケージ
+PHP・Composer依存パッケージ・Dockerイメージの脆弱性検査は、[セキュリティ更新手順書](security-update.md) に従って実施します。
 
-```bash
-docker compose exec php composer audit
-```
+同手順書では、脆弱性情報の収集、影響調査、対応判断、更新、再検査、残存リスク管理までを扱います。
 
-### Dockerイメージ
-
-[Docker Scout](https://docs.docker.com/scout/) で、ビルドしたイメージの脆弱性を検査します。
-
-```bash
-# ベースイメージを最新にして再ビルド
-docker compose build --pull
-
-# 各イメージの概要（Critical・High・Medium・Lowの件数）
-docker scout quickview local://attendance-management-php
-docker scout quickview local://attendance-management-mysql
-docker scout quickview local://attendance-management-nginx
-docker scout quickview axllent/mailpit:v1.33.1
-
-# Critical・Highの詳細と修正版の有無
-docker scout cves local://attendance-management-php --only-severity critical,high
-```
-
-※ ローカルのイメージ名は、リポジトリのディレクトリ名（Composeのプロジェクト名）によって変わります。`docker compose config --images` で確認してください。
-
-### 残存脆弱性の管理
-
-- 修正版が提供されていない脆弱性は、使用状況と影響を評価したうえで受容し、[#144](https://github.com/nae6/laravel-attendance-app/issues/144) に一覧と対応方針を記録しています。
-- 受容した脆弱性は週次で修正版の提供状況を確認し、対応が必要なものは `security-watch` ラベルのIssueとして起票します。
-- 受容した脆弱性は修正済みとは扱わず、修正版が提供され次第、個別に対応します。
+既存の残存脆弱性の評価と対応方針は、[Issue #144](https://github.com/nae6/laravel-attendance-app/issues/144) を参照してください。
 
 ---
 
 ## バックアップ・復旧
 
-アップデート作業の前には、MySQLのデータと `.env` をバックアップしてください。詳細な手順は [バックアップ・復旧手順書](backup-and-restore.md) を参照してください。
+アップデート前には、MySQLデータと `.env` などの必要な情報をバックアップしてください。
 
-### バックアップ（概要）
-
-リポジトリのルートディレクトリで実行します。バックアップはGitリポジトリの外に保存します。
-
-```bash
-mkdir -p ../attendance-management-backups
-chmod 700 ../attendance-management-backups
-BACKUP_DIR="$(cd ../attendance-management-backups && pwd)"
-
-# MySQL（論理バックアップ）
-docker compose exec -T mysql sh -c '
-  export MYSQL_PWD="$MYSQL_ROOT_PASSWORD"
-  exec mysqldump -u root --single-transaction --quick --routines --triggers --events --no-tablespaces attendance_db
-' > "$BACKUP_DIR/attendance_db_$(date +%Y%m%d_%H%M%S).sql"
-
-# Laravelの.env
-cp -p src/.env "$BACKUP_DIR/laravel.env.backup"
-chmod 600 "$BACKUP_DIR/laravel.env.backup"
-```
-
-### 復旧（概要）
-
-- ソースコード：更新前のコミットから復旧用ブランチを作成します。
-- MySQL：更新後のデータボリュームを旧バージョンで再利用せず、新しいデータ領域にSQLダンプを復元します。
-- `.env`：バックアップした `.env` を戻し、`APP_KEY`・DB接続・メール設定を確認します。
+バックアップの取得・復元テスト・障害時の復旧方法は、[バックアップ・復旧手順書](backup-and-restore.md) を参照してください。
 
 SQLダンプと `.env` には秘密情報が含まれるため、Gitへのコミットや第三者への共有はしないでください。
 
