@@ -292,6 +292,12 @@ docker compose exec php php -m
 docker compose exec php php artisan --version
 docker compose exec php composer --version
 docker compose exec php composer check-platform-reqs
+
+# Composerが更新されている場合、以下を確認する
+git diff HEAD -- src/composer.json src/composer.lock
+
+# ブランチ全体で依存関係の定義ファイルに変更がないことを確認したい場合
+git diff main...HEAD -- src/composer.json src/composer.lock
 ```
 
 以下を確認する。
@@ -312,6 +318,9 @@ PHP・Dockerイメージの場合：
 docker scout quickview local://attendance-management-php
 
 docker scout cves local://attendance-management-php --only-severity critical,high
+
+# 脆弱性が解消されたパッケージが修正版のバッケージになっているかを確認する
+docker compose exec php dpkg-query -W krb5-locales libkrb5-3 libc6 openssl libxml2
 ```
 
 Laravel・Composer依存パッケージの場合：
@@ -346,7 +355,11 @@ docker compose exec php php artisan test
 必要に応じてログを確認する。
 
 ```bash
+# PHPコンテナのログを確認する
 docker compose logs --tail=100 php
+
+# Laravelのログを確認する
+docker compose exec php tail -n 100 storage/logs/laravel.log
 ```
 
 ### 6.5 変更差分の確認
