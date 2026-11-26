@@ -41,7 +41,7 @@
 以下の項目を確認する。
 
 - 更新先のバージョン
-- セキュリティ修正・不具合修正の内容
+- セキュリティ修正・不具合修正の内容(影響範囲)
 - アプリケーションに関係する変更
 - 互換性に影響する変更の有無
 
@@ -83,6 +83,9 @@ docker compose ps
 # PHPバージョン
 docker compose exec php php -v
 
+# PHP-FPMバージョン
+docker compose exec php php-fpm -v
+
 # PHP拡張
 docker compose exec php php -m
 
@@ -92,11 +95,14 @@ docker compose exec php php artisan --version
 # Composerバージョン
 docker compose exec php composer --version
 
+# Composerプラットフォーム要件確認
+docker compose exec php composer check-platform-reqs
+
 # Dockerイメージ
 docker compose config --images
 ```
 
-更新前のバージョンをIssueに記録する。
+更新前のバージョン(現在の実行環境)をIssueに記録する。
 
 ### 4.3 更新前の脆弱性検査
 
@@ -105,9 +111,17 @@ docker compose config --images
 PHP・Dockerイメージの場合：
 
 ```bash
+# 検査対象のイメージを確認する
+docker compose images php
+
+# 脆弱性の概要を確認する
 docker scout quickview local://attendance-management-php
 
+# 脆弱性の詳細を確認する
 docker scout cves local://attendance-management-php --only-severity critical,high
+
+#対象CVEが見つからない場合、以下で確認する
+docker scout cves local://attendance-management-php
 ```
 
 Laravel・Composer依存パッケージの場合：
@@ -142,13 +156,25 @@ Dockerイメージを更新する場合は、更新前のイメージIDを確認
 
 ```bash
 docker compose images php
+
+# イメージIDのみを確認する
+docker compose images -q php
 ```
 
 必要に応じて旧イメージに退避用タグを付ける。
 
 ```bash
-docker image tag <IMAGE_ID> attendance-management-php:rollback
+# タグをつける
+docker image tag 6ca6b7767321 attendance-management-php:rollback-8.5.12
+
+# 退避用イメージの確認
+docker image ls attendance-management-php
+
+# 退避用イメージのバージョンを確認
+docker run --rm --entrypoint php attendance-management-php:rollback-8.5.12 -v
 ```
+
+退避のタグ名は変更する前のバージョンを指定する。
 
 データベースや永続データに影響する更新を行う場合は、[バックアップ・復旧手順書](backup-and-restore.md) に従う。
 
@@ -266,6 +292,12 @@ docker compose exec php php -m
 docker compose exec php php artisan --version
 docker compose exec php composer --version
 docker compose exec php composer check-platform-reqs
+
+# Composerが更新されている場合、以下を確認する
+git diff HEAD -- src/composer.json src/composer.lock
+
+# ブランチ全体で依存関係の定義ファイルに変更がないことを確認したい場合
+git diff main...HEAD -- src/composer.json src/composer.lock
 ```
 
 以下を確認する。
@@ -286,6 +318,9 @@ PHP・Dockerイメージの場合：
 docker scout quickview local://attendance-management-php
 
 docker scout cves local://attendance-management-php --only-severity critical,high
+
+# 脆弱性が解消されたパッケージが修正版のバッケージになっているかを確認する
+docker compose exec php dpkg-query -W krb5-locales libkrb5-3 libc6 openssl libxml2
 ```
 
 Laravel・Composer依存パッケージの場合：
@@ -320,7 +355,11 @@ docker compose exec php php artisan test
 必要に応じてログを確認する。
 
 ```bash
+# PHPコンテナのログを確認する
 docker compose logs --tail=100 php
+
+# Laravelのログを確認する
+docker compose exec php tail -n 100 storage/logs/laravel.log
 ```
 
 ### 6.5 変更差分の確認
